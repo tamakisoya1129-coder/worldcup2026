@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>FIFA World Cup 2026 — 出場国紹介</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, #0f1923 0%, #1a2a3a 100%);
+    font-family: -apple-system, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    color: #fff; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    user-select: none;
+  }
+  .wrapper {
+    width: 1200px; height: 675px;
+    flex-shrink: 0; transform-origin: center center;
+    position: relative; overflow: hidden;
+  }
+
+  /* ── SCREENS ── */
+  .screen {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #0f1923 0%, #1a2a3a 100%);
+  }
+  .screen.hidden { display: none; }
+
+  /* ══════════════════════════════
+     HOME SCREEN
+  ══════════════════════════════ */
+  #home {
+    display: flex; flex-direction: column;
+    padding: 28px 52px 28px; gap: 16px;
+  }
+  .home-eyebrow {
+    font-size: 12px; font-weight: 700; color: #8899aa; letter-spacing: 0.16em;
+  }
+  .home-title { font-size: 26px; font-weight: 700; margin-top: 4px; }
+
+  .group-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; flex: 1;
+  }
+  .group-card {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px; padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    position: relative; overflow: hidden;
+  }
+  .group-card.active {
+    cursor: pointer; border-color: rgba(0,212,255,0.3);
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .group-card.active:hover {
+    background: rgba(0,212,255,0.07); border-color: rgba(0,212,255,0.65);
+  }
+  .group-card.active::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: #00d4ff;
+  }
+  .group-card.locked { opacity: 0.2; }
+  .card-label { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: #8899aa; }
+  .group-card.active .card-label { color: #00d4ff; }
+  .card-flags { font-size: 22px; line-height: 1; display: flex; gap: 3px; }
+  .card-names { font-size: 11px; color: #8899aa; line-height: 1.65; }
+  .locked-placeholder { font-size: 12px; color: #8899aa; margin-top: 4px; }
+
+  /* ══════════════════════════════
+     SLIDES SCREEN
+  ══════════════════════════════ */
+  #slides-container { z-index: 1; cursor: pointer; }
+
+  .slide {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #0f1923 0%, #1a2a3a 100%);
+    display: none; flex-direction: column;
+    align-items: stretch;
+    padding: 56px 72px 52px;
+  }
+  .slide.active { display: flex; }
+  .slide-body {
+    display: flex; gap: 36px; align-items: center;
+    flex: 1; width: 100%; min-height: 0;
+  }
+  .slide-left {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .slide-right {
+    flex-shrink: 0;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .mini-map-svg {
+    display: block; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 0 24px rgba(0,0,0,0.5);
+  }
+  .mini-map-btn {
+    font-size: 11px; font-weight: 700; color: #8899aa; letter-spacing: 0.08em;
+    padding: 5px 14px; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px;
+    cursor: pointer; transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .mini-map-btn:hover { color: #00d4ff; border-color: rgba(0,212,255,0.6); }
+
+  .top-bar {
+    position: absolute; top: 22px; left: 88px; right: 88px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .top-left { display: flex; align-items: center; gap: 16px; }
+  .back-btn {
+    font-size: 11px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em;
+    padding: 4px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
+    cursor: pointer; transition: color 0.15s, border-color 0.15s;
+  }
+  .back-btn:hover { color: #00d4ff; border-color: rgba(0,212,255,0.6); }
+  .top-label { font-size: 12px; font-weight: 700; color: #8899aa; letter-spacing: 0.14em; }
+  .page-num  { font-size: 12px; color: #8899aa; letter-spacing: 0.08em; }
+
+  .country-header { display: flex; align-items: center; gap: 24px; width: 100%; }
+  .flag { font-size: 60px; line-height: 1; }
+  .country-name-ja { font-size: 40px; font-weight: 700; }
+  .country-name-en { font-size: 13px; color: #8899aa; margin-top: 5px; letter-spacing: 0.1em; }
+
+  .stats { width: 100%; }
+  .stat-row {
+    display: grid; grid-template-columns: 200px 1fr;
+    align-items: center; gap: 28px;
+    padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-num { font-size: 27px; font-weight: 700; color: #00d4ff; text-align: right; white-space: nowrap; }
+  .stat-desc { font-size: 16px; color: #8899aa; line-height: 1.6; }
+  .stat-desc b { color: #fff; font-weight: 600; }
+
+  .caption {
+    width: 100%; font-size: 15px; color: #00d4ff; font-weight: 600; letter-spacing: 0.04em;
+    border-left: 3px solid #00d4ff; padding-left: 14px;
+  }
+  .dots {
+    position: absolute; bottom: 20px; left: 0; right: 0;
+    display: flex; justify-content: center; gap: 10px;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.2); cursor: pointer; transition: background 0.2s;
+  }
+  .dot.active { background: #00d4ff; }
+  .nav-hint {
+    position: absolute; bottom: 8px; left: 0; right: 0;
+    text-align: center; font-size: 10px; color: rgba(255,255,255,0.15); letter-spacing: 0.1em;
+  }
+
+  /* ── SEARCH BUTTON ── */
+  .search-btn {
+    position: absolute; top: 16px; right: 20px; z-index: 15;
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 20px; cursor: pointer;
+    font-size: 12px; color: #8899aa; letter-spacing: 0.06em;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .search-btn:hover {
+    background: rgba(0,212,255,0.1);
+    border-color: rgba(0,212,255,0.5);
+    color: #00d4ff;
+  }
+
+  /* ── SEARCH OVERLAY ── */
+  #search-overlay {
+    z-index: 20; cursor: default;
+    background: rgba(8,16,26,0.88);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding-top: 80px;
+  }
+  #search-overlay.hidden { display: none; }
+  .search-modal {
+    width: 680px; background: #162030;
+    border: 1px solid rgba(0,212,255,0.25); border-radius: 12px;
+    overflow: hidden; box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  }
+  .search-input-wrap {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .search-icon-label { font-size: 18px; color: #8899aa; flex-shrink: 0; }
+  #search-input {
+    flex: 1; background: transparent; border: none;
+    color: #fff; font-size: 17px; outline: none; font-family: inherit;
+  }
+  #search-input::placeholder { color: rgba(136,153,170,0.6); }
+  .search-close {
+    font-size: 11px; color: #8899aa; cursor: pointer;
+    padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.12);
+    transition: color 0.15s, border-color 0.15s; white-space: nowrap;
+  }
+  .search-close:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+  .search-results { max-height: 340px; overflow-y: auto; }
+  .search-result {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 20px; cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.1s;
+  }
+  .search-result:last-child { border-bottom: none; }
+  .search-result:hover, .search-result.selected { background: rgba(0,212,255,0.09); }
+  .result-flag { font-size: 26px; line-height: 1; flex-shrink: 0; }
+  .result-name { font-size: 15px; font-weight: 700; }
+  .result-group { font-size: 10px; color: #00d4ff; font-weight: 700; letter-spacing: 0.12em; margin-top: 3px; }
+  .result-arrow { margin-left: auto; color: #44586a; font-size: 14px; }
+  .search-empty { padding: 32px 20px; text-align: center; color: #8899aa; font-size: 14px; }
+  .search-hint {
+    padding: 9px 20px; font-size: 10px; color: rgba(136,153,170,0.4);
+    letter-spacing: 0.08em; border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  /* ── MAP SCREEN ── */
+  .home-top {
+    display: flex; justify-content: space-between; align-items: flex-end;
+  }
+  .map-btn {
+    flex-shrink: 0; padding: 6px 14px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 20px; cursor: pointer; color: #8899aa;
+    font-size: 12px; letter-spacing: 0.06em;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .map-btn:hover { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.5); color: #00d4ff; }
+
+  #map-screen { z-index: 2; display: flex; flex-direction: column; }
+  #map-screen.hidden { display: none; }
+  .map-header {
+    display: flex; align-items: center; gap: 20px;
+    padding: 14px 28px; flex-shrink: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .map-back {
+    font-size: 11px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em;
+    padding: 4px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
+    cursor: pointer; transition: color 0.15s, border-color 0.15s;
+  }
+  .map-back:hover { color: #00d4ff; border-color: rgba(0,212,255,0.6); }
+  .map-header-title {
+    font-size: 13px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em;
+  }
+  .map-body {
+    position: relative; flex: 1; overflow: hidden;
+  }
+  .map-markers { position: absolute; inset: 0; pointer-events: none; }
+  .map-marker {
+    position: absolute; transform: translate(-50%, -50%);
+    cursor: pointer; pointer-events: all;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .marker-flag {
+    font-size: 16px; line-height: 1;
+    transition: transform 0.15s; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.6));
+  }
+  .map-marker:hover .marker-flag { transform: scale(1.5); }
+  .map-marker.highlighted .marker-flag { font-size: 22px; }
+  .map-marker.highlighted .marker-tip { display: block; }
+  .pulse-ring {
+    position: absolute; top: 50%; left: 50%;
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 2px solid #00d4ff;
+    animation: pulse-ring 1.5s ease-out infinite;
+    pointer-events: none;
+  }
+  @keyframes pulse-ring {
+    0%   { transform: translate(-50%,-50%) scale(0.6); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(2.2); opacity: 0; }
+  }
+  .map-jump-btn {
+    font-size: 11px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em;
+    padding: 4px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
+    cursor: pointer; transition: color 0.15s, border-color 0.15s;
+  }
+  .map-jump-btn:hover { color: #00d4ff; border-color: rgba(0,212,255,0.6); }
+  .marker-tip {
+    display: none; position: absolute; bottom: calc(100% + 4px); left: 50%;
+    transform: translateX(-50%); white-space: nowrap;
+    background: #0f1f30; border: 1px solid rgba(0,212,255,0.35);
+    border-radius: 6px; padding: 5px 9px; pointer-events: none;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  }
+  .map-marker:hover .marker-tip { display: block; }
+  .tip-group { display: block; font-size: 9px; color: #00d4ff; font-weight: 700; letter-spacing: 0.12em; }
+  .tip-name  { display: block; font-size: 12px; color: #fff; font-weight: 600; margin-top: 1px; }
+
+  /* ── SCHEDULE PANEL ── */
+  .schedule-panel {
+    position: absolute; inset: 0; z-index: 5;
+    background: rgba(8,16,26,0.95);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .schedule-panel.hidden { display: none; }
+  .schedule-inner {
+    width: 540px; background: #162030;
+    border: 1px solid rgba(0,212,255,0.22); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  }
+  .sch-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 24px;
+  }
+  .sch-title { font-size: 13px; font-weight: 700; color: #00d4ff; letter-spacing: 0.1em; }
+  .sch-close {
+    font-size: 11px; color: #8899aa; cursor: pointer;
+    padding: 3px 10px; border: 1px solid rgba(255,255,255,0.12); border-radius: 4px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .sch-close:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+  .matchday-block { margin-bottom: 18px; }
+  .matchday-block:last-child { margin-bottom: 0; }
+  .matchday-label {
+    font-size: 10px; font-weight: 700; color: #8899aa;
+    letter-spacing: 0.14em; margin-bottom: 8px;
+  }
+  .match-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 11px 18px; margin-bottom: 6px;
+    background: rgba(255,255,255,0.04); border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+  .match-row:last-child { margin-bottom: 0; }
+  .match-team { font-size: 14px; font-weight: 600; }
+  .match-vs { font-size: 11px; color: #8899aa; font-weight: 700; letter-spacing: 0.1em; }
+  .schedule-btn {
+    font-size: 11px; font-weight: 700; color: #8899aa; letter-spacing: 0.08em;
+    padding: 4px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
+    cursor: pointer; transition: color 0.15s, border-color 0.15s;
+  }
+  .schedule-btn:hover { color: #00d4ff; border-color: rgba(0,212,255,0.6); }
+  .top-right { display: flex; align-items: center; gap: 14px; }
+
+  /* ── DICE OVERLAY ── */
+  #dice-overlay {
+    position: absolute; inset: 0; z-index: 25;
+    display: flex; align-items: center; justify-content: center;
+    animation: dice-bg 1.5s ease forwards;
+  }
+  #dice-overlay.hidden { display: none; }
+  @keyframes dice-bg {
+    0%   { background: rgba(8,16,26,0); }
+    15%  { background: rgba(8,16,26,0.93); }
+    75%  { background: rgba(8,16,26,0.93); }
+    100% { background: rgba(8,16,26,0); }
+  }
+  .dice-scene { perspective: 900px; width: 220px; height: 220px; }
+  .dice-cube {
+    width: 220px; height: 220px;
+    position: relative; transform-style: preserve-3d;
+    animation: dice-spin 1.5s cubic-bezier(0.18, 0.6, 0.35, 1) forwards;
+  }
+  @keyframes dice-spin {
+    0%   { transform: rotateX(0deg)   rotateY(0deg)   rotateZ(0deg)   scale3d(0.08,0.08,0.08); }
+    18%  { transform: rotateX(210deg) rotateY(135deg) rotateZ(60deg)  scale3d(1.12,1.12,1.12); }
+    38%  { transform: rotateX(390deg) rotateY(265deg) rotateZ(130deg) scale3d(0.96,0.96,0.96); }
+    60%  { transform: rotateX(560deg) rotateY(385deg) rotateZ(210deg) scale3d(1.01,1.01,1.01); }
+    82%  { transform: rotateX(670deg) rotateY(495deg) rotateZ(310deg) scale3d(1.0,1.0,1.0); }
+    100% { transform: rotateX(720deg) rotateY(540deg) rotateZ(360deg) scale3d(1.0,1.0,1.0); }
+  }
+  .dice-face {
+    position: absolute; width: 220px; height: 220px;
+    background: linear-gradient(145deg, #1a3a58, #0d1f30);
+    border: 1.5px solid rgba(0,212,255,0.4);
+    border-radius: 24px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    padding: 24px;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.5), 0 0 28px rgba(0,212,255,0.18);
+  }
+  .dice-face .dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #7df5ff, #00d4ff);
+    box-shadow: 0 0 14px rgba(0,212,255,0.9);
+    align-self: center; justify-self: center;
+  }
+  .dice-front  { transform: translateZ(110px); }
+  .dice-back   { transform: rotateY(180deg)  translateZ(110px); }
+  .dice-right  { transform: rotateY(90deg)   translateZ(110px); }
+  .dice-left   { transform: rotateY(-90deg)  translateZ(110px); }
+  .dice-top    { transform: rotateX(90deg)   translateZ(110px); }
+  .dice-bottom { transform: rotateX(-90deg)  translateZ(110px); }
+
+  /* ── PK GAME ── */
+  #pk-overlay {
+    position: absolute; inset: 0; z-index: 22;
+    display: flex; flex-direction: column;
+    background: linear-gradient(180deg, #0a1c35 0%, #0d2818 55%, #0a2018 100%);
+  }
+  #pk-overlay.hidden { display: none; }
+  .pk-hdr {
+    display: flex; align-items: center; gap: 20px;
+    padding: 14px 28px; flex-shrink: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .pk-hdr-back {
+    font-size: 11px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em;
+    padding: 4px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
+    cursor: pointer; transition: color 0.15s, border-color 0.15s;
+  }
+  .pk-hdr-back:hover { color: #00d4ff; border-color: rgba(0,212,255,0.6); }
+  .pk-hdr-title { font-size: 13px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em; }
+  .pk-hdr-dots { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  .pk-hdot {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .pk-hdot.scored { border-color: #00ff88; background: rgba(0,255,136,0.15); }
+  .pk-hdot.missed { border-color: #ff4466; background: rgba(255,68,102,0.1); }
+  .pk-body {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 20px;
+  }
+  .pk-goal-wrap { position: relative; width: 600px; height: 370px; }
+  .pk-goal {
+    position: absolute; top: 0; left: 0; right: 0; height: 300px;
+    border: 8px solid rgba(255,255,255,0.88);
+    border-bottom: none; border-radius: 6px 6px 0 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 29px, rgba(255,255,255,0.04) 30px),
+      repeating-linear-gradient(90deg, transparent, transparent 99px, rgba(255,255,255,0.04) 100px),
+      rgba(0,0,0,0.15);
+    box-shadow: inset 6px 0 14px rgba(0,0,0,0.3), inset -6px 0 14px rgba(0,0,0,0.3),
+                inset 0 6px 14px rgba(0,0,0,0.3);
+  }
+  .pk-ground {
+    position: absolute; top: 299px; left: -16px; right: -16px; height: 8px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12) 10%, rgba(255,255,255,0.12) 90%, transparent);
+    border-radius: 2px;
+  }
+  .pk-zones-grid {
+    position: absolute; top: 16px; left: 16px; right: 16px; height: 268px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr; gap: 6px;
+  }
+  .pk-zone {
+    border: 1.5px dashed rgba(255,255,255,0.1); border-radius: 4px;
+    cursor: pointer; transition: background 0.12s, border-color 0.12s;
+  }
+  .pk-zone:not(.pk-inactive):hover {
+    background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.5);
+  }
+  .pk-zone.pk-inactive { cursor: default; pointer-events: none; }
+  .pk-keeper {
+    position: absolute; left: 50%; top: 235px; font-size: 48px; line-height: 1;
+    transform: translateX(-50%); z-index: 2; pointer-events: none;
+    transition: transform 0.22s cubic-bezier(0.15, 0, 0.3, 1);
+  }
+  .pk-keeper.z0 { transform: translateX(calc(-50% - 185px)) translateY(-170px) rotate(-38deg); }
+  .pk-keeper.z1 { transform: translateX(-50%)               translateY(-185px); }
+  .pk-keeper.z2 { transform: translateX(calc(-50% + 185px)) translateY(-170px) rotate(38deg); }
+  .pk-keeper.z3 { transform: translateX(calc(-50% - 185px)) translateY(-18px) rotate(-14deg); }
+  .pk-keeper.z4 { transform: translateX(-50%)               translateY(-10px); }
+  .pk-keeper.z5 { transform: translateX(calc(-50% + 185px)) translateY(-18px) rotate(14deg); }
+  .pk-ball {
+    position: absolute; left: 50%; top: 92%; font-size: 30px; line-height: 1;
+    transform: translateX(-50%); z-index: 3; pointer-events: none;
+  }
+  .pk-ball.fly {
+    transition: left 0.38s ease-in, top 0.38s ease-in, font-size 0.38s ease-in;
+  }
+  .pk-flash {
+    position: absolute; top: 0; left: 0; right: 0; height: 300px; z-index: 4;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 44px; font-weight: 900; letter-spacing: 0.04em;
+    opacity: 0; pointer-events: none; transition: opacity 0.15s;
+  }
+  .pk-flash.on { opacity: 1; }
+  .pk-flash.goal-msg  { color: #00ff88; text-shadow: 0 0 40px rgba(0,255,100,0.9); }
+  .pk-flash.saved-msg { color: #ff4466; text-shadow: 0 0 40px rgba(255,60,80,0.9); }
+  .pk-prompt {
+    font-size: 14px; color: #8899aa; letter-spacing: 0.08em;
+    height: 22px; text-align: center;
+  }
+  .pk-final {
+    position: absolute; inset: 0; z-index: 10;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: rgba(8,16,26,0.97); gap: 16px;
+  }
+  .pk-final.hidden { display: none; }
+  .pk-final-score { font-size: 80px; font-weight: 900; color: #00d4ff; text-shadow: 0 0 50px rgba(0,212,255,0.6); }
+  .pk-final-msg { font-size: 22px; font-weight: 700; color: #fff; }
+  .pk-final-sub { font-size: 13px; color: #8899aa; }
+  .pk-final-btns { display: flex; gap: 14px; margin-top: 16px; }
+  .pk-btn-primary {
+    padding: 10px 28px; border-radius: 6px; cursor: pointer;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
+    background: rgba(0,212,255,0.14); border: 1.5px solid rgba(0,212,255,0.5); color: #00d4ff;
+    transition: background 0.15s;
+  }
+  .pk-btn-primary:hover { background: rgba(0,212,255,0.25); }
+  .pk-btn-secondary {
+    padding: 10px 28px; border-radius: 6px; cursor: pointer;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
+    background: rgba(255,255,255,0.05); border: 1.5px solid rgba(255,255,255,0.15); color: #8899aa;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .pk-btn-secondary:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+<div class="wrapper" id="wrapper">
+
+  <!-- ══ HOME SCREEN ══ -->
+  <div class="screen" id="home">
+    <div class="home-top">
+      <div>
+        <div class="home-eyebrow">🏆 FIFA WORLD CUP 2026</div>
+        <div class="home-title">出場国紹介 — グループを選択</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <div class="map-btn" id="pk-btn">⚽ PKゲーム</div>
+        <div class="map-btn" id="rand-btn">🎲 ランダム</div>
+        <div class="map-btn" id="map-btn">🗺 世界地図</div>
+      </div>
+    </div>
+    <div class="group-grid" id="group-grid"></div>
+  </div>
+
+  <!-- ══ MAP SCREEN ══ -->
+  <div class="screen hidden" id="map-screen">
+    <div class="map-header">
+      <span class="map-back" id="map-back">← ホーム</span>
+      <span class="map-header-title">🗺 FIFA WORLD CUP 2026 — 出場国マップ</span>
+    </div>
+    <div class="map-body" id="map-body">
+      <div class="map-markers" id="map-markers"></div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDES SCREEN ══ -->
+  <div class="screen hidden" id="slides-container"></div>
+
+  <!-- ══ SEARCH BUTTON（全画面共通・右上固定）══ -->
+  <div class="search-btn" id="search-btn">🔍 国名を検索</div>
+
+  <!-- ══ SEARCH OVERLAY ══ -->
+  <div class="screen hidden" id="search-overlay">
+    <div class="search-modal">
+      <div class="search-input-wrap">
+        <span class="search-icon-label">🔍</span>
+        <input id="search-input" type="text" placeholder="国名を入力…" autocomplete="off" spellcheck="false">
+        <span class="search-close" id="search-close">ESC</span>
+      </div>
+      <div class="search-results" id="search-results"></div>
+      <div class="search-hint">↑↓ で選択 &nbsp;·&nbsp; Enter で決定 &nbsp;·&nbsp; ESC で閉じる</div>
+    </div>
+  </div>
+
+  <!-- ══ PK GAME ══ -->
+  <div id="pk-overlay" class="hidden">
+    <div class="pk-hdr">
+      <span class="pk-hdr-back" id="pk-back">← 戻る</span>
+      <span class="pk-hdr-title">⚽ PK対決 — 5本勝負</span>
+      <div class="pk-hdr-dots" id="pk-hdr-dots"></div>
+    </div>
+    <div class="pk-body">
+      <div class="pk-goal-wrap">
+        <div class="pk-goal"></div>
+        <div class="pk-zones-grid" id="pk-zones-grid"></div>
+        <div class="pk-keeper" id="pk-keeper">🧤</div>
+        <div class="pk-flash" id="pk-flash"></div>
+        <div class="pk-ground"></div>
+        <div class="pk-ball" id="pk-ball">⚽</div>
+      </div>
+      <div class="pk-prompt" id="pk-prompt"></div>
+    </div>
+    <div class="pk-final hidden" id="pk-final">
+      <div class="pk-final-score" id="pk-final-score"></div>
+      <div class="pk-final-msg" id="pk-final-msg"></div>
+      <div class="pk-final-sub" id="pk-final-sub"></div>
+      <div class="pk-final-btns">
+        <div class="pk-btn-primary" id="pk-retry">もう一度</div>
+        <div class="pk-btn-secondary" id="pk-exit">ホームへ</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DICE OVERLAY ══ -->
+  <div id="dice-overlay" class="hidden">
+    <div class="dice-scene">
+      <div class="dice-cube">
+        <div class="dice-face dice-front">
+          <span class="dot" style="grid-row:2;grid-column:2"></span>
+        </div>
+        <div class="dice-face dice-back">
+          <span class="dot" style="grid-row:1;grid-column:1"></span>
+          <span class="dot" style="grid-row:1;grid-column:3"></span>
+          <span class="dot" style="grid-row:2;grid-column:1"></span>
+          <span class="dot" style="grid-row:2;grid-column:3"></span>
+          <span class="dot" style="grid-row:3;grid-column:1"></span>
+          <span class="dot" style="grid-row:3;grid-column:3"></span>
+        </div>
+        <div class="dice-face dice-right">
+          <span class="dot" style="grid-row:1;grid-column:3"></span>
+          <span class="dot" style="grid-row:2;grid-column:2"></span>
+          <span class="dot" style="grid-row:3;grid-column:1"></span>
+        </div>
+        <div class="dice-face dice-left">
+          <span class="dot" style="grid-row:1;grid-column:1"></span>
+          <span class="dot" style="grid-row:1;grid-column:3"></span>
+          <span class="dot" style="grid-row:3;grid-column:1"></span>
+          <span class="dot" style="grid-row:3;grid-column:3"></span>
+        </div>
+        <div class="dice-face dice-top">
+          <span class="dot" style="grid-row:1;grid-column:1"></span>
+          <span class="dot" style="grid-row:1;grid-column:3"></span>
+          <span class="dot" style="grid-row:2;grid-column:2"></span>
+          <span class="dot" style="grid-row:3;grid-column:1"></span>
+          <span class="dot" style="grid-row:3;grid-column:3"></span>
+        </div>
+        <div class="dice-face dice-bottom">
+          <span class="dot" style="grid-row:1;grid-column:3"></span>
+          <span class="dot" style="grid-row:3;grid-column:1"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<script>
+/* ─────────────────────────────────────────
+   DATA
+───────────────────────────────────────── */
+const DATA = {
+  A: {
+    label: 'GROUP A',
+    flags: ['🇲🇽','🇿🇦','🇰🇷','🇨🇿'],
+    names: ['メキシコ','南アフリカ','韓国','チェコ'],
+    countries: [
+      { flag:'🇲🇽', nameJa:'メキシコ',
+        nameEn:'MEXICO &nbsp;|&nbsp; 開催国 · 開幕戦ホスト（6.11）',
+        stats:[
+          { num:'634杯/人・年', desc:'<b>コカ・コーラ消費量 世界1位</b><br>本家アメリカ（403杯）を1.6倍上回る' },
+          { num:'体積 世界最大', desc:'<b>チョルーラの大ピラミッド</b>（プエブラ州）<br>ギザより大きいが、頂上にスペインが教会を建設済み' },
+          { num:'約6,000t/年', desc:'<b>白銀産出量 世界1位</b><br>「銀のベルト」鉱山地帯が今も現役' },
+        ],
+        caption:'恐竜を絶滅させた隕石の落下地点（チクシュルーブ・クレーター）もこの国にある' },
+      { flag:'🇿🇦', nameJa:'南アフリカ',
+        nameEn:'SOUTH AFRICA &nbsp;|&nbsp; Rainbow Nation',
+        stats:[
+          { num:'12言語', desc:'<b>公用語の数（世界最多水準）</b><br>ズールー〜手話まで。この多様性が「レインボーネーション」の由来' },
+          { num:'1967.12.3', desc:'<b>世界初の心臓移植（ケープタウン）</b><br>バーナード医師が執刀。患者は術後18日間生存した' },
+          { num:'3競技', desc:'<b>W杯を開催した競技数（アフリカ大陸唯一）</b><br>ラグビー1995（優勝）· クリケット2003 · サッカー2010（アフリカ初）' },
+        ],
+        caption:'行政・立法・司法で首都が3つに分かれている世界でも珍しい国' },
+      { flag:'🇰🇷', nameJa:'韓国',
+        nameEn:'SOUTH KOREA &nbsp;|&nbsp; 漢江の奇跡',
+        stats:[
+          { num:'0.72', desc:'<b>合計特殊出生率（2023年・人類史上最低値）</b><br>2070年には人口が現在の半分以下になるとの推計' },
+          { num:'$79 → $33,000', desc:'<b>1人当たりGDP（1960年→現在）</b><br>「漢江の奇跡」——1世代で最貧国から先進国入りを果たした' },
+          { num:'約21%', desc:'<b>苗字「金（キム）」の人口比率</b><br>5人に1人が同じ苗字' },
+        ],
+        caption:'2002年W杯：イタリア・スペインを連続撃破して4強進出' },
+      { flag:'🇨🇿', nameJa:'チェコ',
+        nameEn:'CZECHIA &nbsp;|&nbsp; 発明と黒ビールの国',
+        stats:[
+          { num:'1921年', desc:'<b>「Robot」という単語が生まれた年（チェコ発明）</b><br>カレル・チャペックの戯曲『R.U.R.』が語源。命名したのは弟のヨゼフ' },
+          { num:'1959年', desc:'<b>ソフトコンタクトレンズ発明（チェコ）</b><br>化学者ヴィヒテルレが開発。現在世界1億4000万人以上が使用' },
+          { num:'160L/人・年', desc:'<b>ビール消費量 世界1位</b><br>ドイツ（96L）を大きく引き離す。「ビールの本場」はチェコだ' },
+        ],
+        caption:'プラハは第二次大戦の爆撃をほぼ免れた欧州の数少ない大都市のひとつ' },
+    ]
+  },
+  B: {
+    label: 'GROUP B',
+    flags: ['🇨🇦','🇧🇦','🇶🇦','🇨🇭'],
+    names: ['カナダ','ボスニア','カタール','スイス'],
+    countries: [
+      { flag:'🇨🇦', nameJa:'カナダ',
+        nameEn:'CANADA &nbsp;|&nbsp; 開催国（初のW杯自国開催）',
+        stats:[
+          { num:'世界の71%', desc:'<b>メープルシロップ生産量</b><br>ほぼ全量がケベック州から。「メープルの国」は比喩ではない' },
+          { num:'202,080km', desc:'<b>海岸線の長さ（世界1位）</b><br>3大洋に面し、地球約5周分。2位ノルウェーの約3倍' },
+          { num:'約56%', desc:'<b>高等教育修了率（G7最高）</b><br>人口の約25%が外国生まれ——「最も移民に開かれた先進国」' },
+        ],
+        caption:'面積世界2位・人口密度わずか4人/km²——広大すぎる国' },
+      { flag:'🇧🇦', nameJa:'ボスニア・ヘルツェゴビナ',
+        nameEn:'BOSNIA AND HERZEGOVINA &nbsp;|&nbsp; WWI発火点の国',
+        stats:[
+          { num:'1914年', desc:'<b>第一次世界大戦の引き金（サラエボ）</b><br>フランツ・フェルディナント大公暗殺が1,600万人以上の死者を出す大戦の発火点に' },
+          { num:'1,425日', desc:'<b>サラエボ包囲戦（近代欧州史上最長）</b><br>1992〜1996年、毎日平均300発超の砲弾が着弾。10万人が犠牲に' },
+          { num:'歌詞なし', desc:'<b>国歌に公式歌詞が存在しない</b><br>民族対立（ボスニア人・セルビア人・クロアチア人）で30年以上未決定' },
+        ],
+        caption:'人口380万の小国が初のグループ突破を狙う' },
+      { flag:'🇶🇦', nameJa:'カタール',
+        nameEn:'QATAR &nbsp;|&nbsp; 前回W杯開催国（2022）',
+        stats:[
+          { num:'自国民 12%', desc:'<b>人口の88%が外国人</b><br>インド系21%、バングラデシュ系13%...。「カタール人」が少数派の自国' },
+          { num:'輸出の90%超', desc:'<b>天然ガス・石油（総額1,190億ドル以上）</b><br>1950年代まで真珠漁の国が、1世代で世界最富裕国の仲間入り' },
+          { num:'ロボット', desc:'<b>ラクダレースのジョッキーが遠隔操作ロボット</b><br>児童労働禁止後、小型ロボットがラクダの背で鞭を振るう' },
+        ],
+        caption:'2022年・中東初のW杯開催国が今度は「一般参加」で挑む' },
+      { flag:'🇨🇭', nameJa:'スイス',
+        nameEn:'SWITZERLAND &nbsp;|&nbsp; 永世中立国',
+        stats:[
+          { num:'210年以上', desc:'<b>永世中立（1815年〜）、一度も戦争に参加せず</b><br>ウィーン会議で宣言。現在もNATO未加盟' },
+          { num:'57.1km', desc:'<b>ゴッタルドベーストンネル（世界最長鉄道トンネル）</b><br>2016年完成。英仏海峡トンネル（50km）を7km以上上回る' },
+          { num:'正方形', desc:'<b>世界で2か国のみの正方形国旗（もう1か国はバチカン）</b><br>ほぼ全ての国が長方形の中、スイスは建国以来ずっと正方形を守る' },
+        ],
+        caption:'イノベーション指数13年連続1位・赤十字発祥の国' },
+    ]
+  },
+  C: {
+    label: 'GROUP C',
+    flags: ['🇧🇷','🇲🇦','🇭🇹','🏴󠁧󠁢󠁳󠁣󠁴󠁿'],
+    names: ['ブラジル','モロッコ','ハイチ','スコットランド'],
+    countries: [
+      { flag:'🇧🇷', nameJa:'ブラジル',
+        nameEn:'BRAZIL &nbsp;|&nbsp; W杯最多優勝国',
+        stats:[
+          { num:'5回優勝', desc:'<b>W杯優勝回数 歴代最多</b><br>1958・1962・1970・1994・2002年。2位ドイツ・イタリアの4回を上回る' },
+          { num:'150年以上連続', desc:'<b>コーヒー生産量 世界1位</b><br>年間35億kg超を生産。「コーヒー大国」はブラジルのためにある言葉' },
+          { num:'約150万人', desc:'<b>日系人口 日本国外で世界最大</b><br>1908年移民開始以来、世界最大の海外日系コミュニティが誕生' },
+        ],
+        caption:'2014年自国開催でドイツに1-7の歴史的大敗——それでも最多優勝国は揺るがない' },
+      { flag:'🇲🇦', nameJa:'モロッコ',
+        nameEn:'MOROCCO &nbsp;|&nbsp; 世界最古の知の国',
+        stats:[
+          { num:'30万年前', desc:'<b>ホモ・サピエンス最古の化石発見地（ジェベル・イルード）</b><br>従来の定説「エチオピア・19万年前」を覆した' },
+          { num:'857年創設', desc:'<b>世界最古の大学：カラウイーン大学（フェズ）</b><br>女性が創設。ボローニャ大学（1088年）より230年古い' },
+          { num:'1777年', desc:'<b>アメリカ独立を世界最初に承認した国</b><br>独立宣言から1年半後に国家承認。今も米国と友好条約を維持' },
+        ],
+        caption:'2022年W杯：アフリカ・アラブ諸国として史上初の4強進出' },
+      { flag:'🇭🇹', nameJa:'ハイチ',
+        nameEn:'HAITI &nbsp;|&nbsp; 世界初の黒人共和国',
+        stats:[
+          { num:'1804年独立', desc:'<b>世界初の黒人共和国</b><br>奴隷反乱がフランス支配を打破。西半球で米国に次ぐ2番目の独立国' },
+          { num:'米国領土2倍', desc:'<b>ルイジアナ購入のきっかけはハイチ革命</b><br>ナポレオンの大陸戦略断念→米国に広大な土地売却→米国が約2倍に拡大' },
+          { num:'ハイチ語', desc:'<b>「ゾンビ（Zombie）」という言葉の語源</b><br>ヴードゥー教の文化から生まれた概念。死後の解放を信じた奴隷たちの世界観に由来' },
+        ],
+        caption:'1974年以来52年ぶりのW杯出場——革命の国が半世紀越しに世界舞台へ' },
+      { flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿', nameJa:'スコットランド',
+        nameEn:'SCOTLAND &nbsp;|&nbsp; ユニコーンの国',
+        stats:[
+          { num:'47秒', desc:'<b>世界最短の定期商業フライト（オークニー諸島）</b><br>搭乗・降機の時間の方が飛行時間より長い' },
+          { num:'ユニコーン', desc:'<b>国獣（国家紋章に正式採用）</b><br>「ライオンを唯一制する生き物」との伝説から中世以来の伝統' },
+          { num:'3つの発明', desc:'<b>電話・テレビ・自転車すべてスコットランド人が発明</b><br>ベル（電話）・ベアード（テレビ）・マクミラン（自転車）。人口550万の小国の偉業' },
+        ],
+        caption:'1998年以来28年ぶりのW杯出場——グループCでブラジルに挑む' },
+    ]
+  },
+  D: {
+    label: 'GROUP D',
+    flags: ['🇺🇸','🇵🇾','🇦🇺','🇹🇷'],
+    names: ['アメリカ','パラグアイ','オーストラリア','トルコ'],
+    countries: [
+      { flag:'🇺🇸', nameJa:'アメリカ',
+        nameEn:'USA &nbsp;|&nbsp; 開催国（78試合を自国で開催）',
+        stats:[
+          { num:'公用語なし', desc:'<b>英語は事実上の国語だが憲法に公用語の規定がない</b><br>スペイン語話者が4,000万人以上おりスペイン語も事実上の第2言語' },
+          { num:'35,000以上', desc:'<b>博物館の数（スタバ＋マック全米店舗合計を超える）</b><br>美術館・科学館・歴史博物館を含む総数が全米に点在' },
+          { num:'唯一', desc:'<b>月面着陸に成功した唯一の国（アポロ計画1969年〜）</b><br>12人が月面を歩いた。2位は今のところ存在しない' },
+        ],
+        caption:'開催国として78試合を自国で主催——史上最多の試合を誇るW杯の「本部」' },
+      { flag:'🇵🇾', nameJa:'パラグアイ',
+        nameEn:'PARAGUAY &nbsp;|&nbsp; 南米の心臓',
+        stats:[
+          { num:'両面が異なる', desc:'<b>国旗の両面で異なる紋章（世界唯一）</b><br>表に国章、裏に財務印章——どちらが表かによって異なるデザイン' },
+          { num:'内陸最大', desc:'<b>内陸国でありながら世界最大の内陸海軍を保有</b><br>海なし国でも川を守る海軍が存在する' },
+          { num:'99.9%', desc:'<b>電力の99.9%が水力発電</b><br>主にイタイプーダム（ブラジルと共同運営）から。化石燃料にほぼ依存しない' },
+        ],
+        caption:'三国同盟戦争（1864〜70年）で人口の半分を失った南米の小国' },
+      { flag:'🇦🇺', nameJa:'オーストラリア',
+        nameEn:'AUSTRALIA &nbsp;|&nbsp; 世界最古の文明の地',
+        stats:[
+          { num:'7万年以上', desc:'<b>アボリジニ文化：世界最古の継続する文明</b><br>アフリカを出た現生人類が最初に定着した地のひとつ。250以上の言語を使用' },
+          { num:'64年間違法', desc:'<b>昼間の公衆水泳が1838〜1902年まで刑事罰対象</b><br>「水着不足と公序良俗」を理由に禁止。日中海に入ると逮捕された' },
+          { num:'80%', desc:'<b>野生動物の80%がオーストラリア固有種</b><br>カンガルー・コアラ・カモノハシ——他のどこにも生息しない動物の宝庫' },
+        ],
+        caption:'人口の49%が外国生まれ、またはその子——「移民の大陸」でもある' },
+      { flag:'🇹🇷', nameJa:'トルコ',
+        nameEn:'TÜRKIYE &nbsp;|&nbsp; 文明の十字路',
+        stats:[
+          { num:'12,000年前', desc:'<b>ゲベクリ・テペ：世界最古の宗教的建造物</b><br>農耕開始より前に巨石神殿を建設。従来の文明観を根本から覆した遺跡' },
+          { num:'200kg/人・年', desc:'<b>パン消費量 世界1位</b><br>1日あたり550g以上。パン文化の深さはトルコ語の挨拶にも現れる' },
+          { num:'世界の75%', desc:'<b>ヘーゼルナッツ生産量</b><br>世界で消費されるヘーゼルナッツの4本に3本はトルコ産。ヌテラの主要原料' },
+        ],
+        caption:'オスマン帝国600年以上（1299〜1922）——欧州最古の地下鉄もトルコ発祥（1875年）' },
+    ]
+  },
+  E: {
+    label: 'GROUP E',
+    flags: ['🇩🇪','🇨🇼','🇨🇮','🇪🇨'],
+    names: ['ドイツ','キュラソー','コートジボワール','エクアドル'],
+    countries: [
+      { flag:'🇩🇪', nameJa:'ドイツ',
+        nameEn:'GERMANY &nbsp;|&nbsp; 発明大国',
+        stats:[
+          { num:'3種の発明', desc:'<b>グミベア（1922年）・MP3・活版印刷——全部ドイツ発明</b><br>世界中の子供が食べるグミと音楽を変えた形式と情報革命の種が同じ国から' },
+          { num:'66%', desc:'<b>リサイクル率 世界1位</b><br>ゴミの3分の2を再利用。欧州最大経済圏が「捨てない国」を実践している' },
+          { num:'65%が無制限', desc:'<b>アウトバーンの法定最高速度なし区間</b><br>一部区間では時速300km以上での走行も法律上は合法' },
+        ],
+        caption:'国土の3分の1が森林——ベルリンの橋は2,500本、ヴェネツィアの4倍' },
+      { flag:'🇨🇼', nameJa:'キュラソー',
+        nameEn:'CURAÇAO &nbsp;|&nbsp; カリブ海の小島国',
+        stats:[
+          { num:'15世紀から', desc:'<b>西半球最古のユダヤ人コミュニティ</b><br>15世紀にポルトガルから逃れたセファルディム系ユダヤ人が定住。今も現存' },
+          { num:'上陸ゼロ', desc:'<b>NHC記録開始以来、ハリケーンが一度も直撃していない</b><br>カリブ海に位置しながらハリケーン帯域の南端にあたるため' },
+          { num:'人口15.8万', desc:'<b>史上最小水準のW杯出場国のひとつ</b><br>面積444km²の小島が世界48チームに名を連ねた' },
+        ],
+        caption:'ウィルヘルミナスタット：ユネスコ世界遺産の港湾都市' },
+      { flag:'🇨🇮', nameJa:'コートジボワール',
+        nameEn:"CÔTE D'IVOIRE &nbsp;|&nbsp; カカオの国",
+        stats:[
+          { num:'輸出額世界1位', desc:'<b>カカオ豆の輸出量</b><br>世界のチョコレートの原料の40%以上を供給。コートジボワールなしにチョコは語れない' },
+          { num:'面積30,000m²', desc:'<b>世界最大の教会：ヤムスクロの聖母大聖堂（1989年）</b><br>ローマのサン・ピエトロ大聖堂より大きい。人口600万の首都に建てられた' },
+          { num:'世界3位', desc:'<b>アビジャン：世界3位のフランス語都市</b><br>パリ・キンシャサに次ぐ規模のフランス語圏大都市（人口500万超）' },
+        ],
+        caption:'独立時はアフリカ最富裕国のひとつ——ドログバが内戦停戦を呼びかけた国' },
+      { flag:'🇪🇨', nameJa:'エクアドル',
+        nameEn:'ECUADOR &nbsp;|&nbsp; 地球の中心の国',
+        stats:[
+          { num:'世界遺産1号・2号', desc:'<b>1978年、世界最初のユネスコ世界遺産2か所が同時登録</b><br>ガラパゴス諸島（1号）とキト歴史地区（2号）——どちらもエクアドル' },
+          { num:'地球中心から最遠', desc:'<b>チンボラソ山頂は地球の中心から最も遠い地点</b><br>エベレストより低いが、地球の膨らみにより地球中心からの距離はエベレストを超える' },
+          { num:'5,300年前', desc:'<b>カカオ最古の証拠（マヨ・チンチペ族の土器）</b><br>チョコレートの原料カカオの使用痕が世界最古の記録として発見された場所' },
+        ],
+        caption:'赤道（エクアドル）の国：南北両半球に同時に立てる「中の世界博物館」がある' },
+    ]
+  },
+  F: {
+    label: 'GROUP F',
+    flags: ['🇳🇱','🇯🇵','🇸🇪','🇹🇳'],
+    names: ['オランダ','日本','スウェーデン','チュニジア'],
+    countries: [
+      { flag:'🇳🇱', nameJa:'オランダ',
+        nameEn:'NETHERLANDS &nbsp;|&nbsp; 干拓の国',
+        stats:[
+          { num:'2001年4月1日', desc:'<b>同性婚を世界で初めて合法化</b><br>エイプリルフールと重なる日付に意図的に制定。以降50か国以上が追随' },
+          { num:'国土の26%', desc:'<b>海面以下の土地（堤防・干拓で維持）</b><br>オランダの知恵がなければ国土の4分の1が水没する' },
+          { num:'1.3台/人', desc:'<b>自転車の台数（2,280万台）が人口（1,700万人）より多い</b><br>世界で唯一、自転車が人より多い国' },
+        ],
+        caption:'国歌ウィルヘムスは1568年作曲——世界最古の国歌' },
+      { flag:'🇯🇵', nameJa:'日本',
+        nameEn:'JAPAN &nbsp;|&nbsp; 8大会連続出場',
+        stats:[
+          { num:'60年間ゼロ', desc:'<b>新幹線：1964年開業以来の乗客死亡事故ゼロ</b><br>年間延べ4億人以上を輸送しながら60年以上維持する安全記録' },
+          { num:'65歳以上29%超', desc:'<b>高齢化率 世界最高</b><br>世界で最も速く老いた国。社会保障と人手不足の課題が突きつけられている' },
+          { num:'約400万台', desc:'<b>自動販売機の台数（人口30人に1台、世界最高密度）</b><br>コーヒーから日本酒まで——「いつでもどこでも買える国」' },
+        ],
+        caption:'1998年から8大会連続W杯出場——アジア地区予選を世界最速で突破した' },
+      { flag:'🇸🇪', nameJa:'スウェーデン',
+        nameEn:'SWEDEN &nbsp;|&nbsp; 北欧の発明大国',
+        stats:[
+          { num:'1967年9月3日', desc:'<b>一晩で右側通行に切り替えた（ダーゲンH）</b><br>国民の82%が反対した中、政府が強行。当日の混乱は最小限に抑えられた' },
+          { num:'音楽輸出 世界3位', desc:'<b>米英に次ぐ音楽輸出大国</b><br>ABBA・Avicii・Robyn——人口1000万の国が米英に次ぐ音楽輸出を誇る' },
+          { num:'480日', desc:'<b>育児休暇（父母合計16ヶ月）、給与77.6%保証</b><br>世界最長水準の育児休暇制度。父親の取得が当たり前の社会' },
+        ],
+        caption:'バイキングの末裔が9世紀に「ロシア最初の王国」を建設したとされる' },
+      { flag:'🇹🇳', nameJa:'チュニジア',
+        nameEn:'TUNISIA &nbsp;|&nbsp; アフリカ最北端の国',
+        stats:[
+          { num:'タトゥイーン', desc:'<b>スターウォーズの惑星名は実在するチュニジアの町「タタウィン」が由来</b><br>砂漠の風景が惑星タトゥイーンのロケ地として使われた' },
+          { num:'世界最大', desc:'<b>バルド国立博物館：ローマ時代のモザイク世界最大コレクション</b><br>古代カルタゴの地に集積された地中海文明の遺産' },
+          { num:'最北端', desc:'<b>アフリカ大陸の最北端（ラス・アンジェラ岬）に位置</b><br>ヨーロッパとアフリカの境界に最も近い国のひとつ' },
+        ],
+        caption:'カルタゴはここで生まれ、ここで滅んだ——200,000年の人類居住の地' },
+    ]
+  },
+  G: {
+    label: 'GROUP G',
+    flags: ['🇧🇪','🇪🇬','🇮🇷','🇳🇿'],
+    names: ['ベルギー','エジプト','イラン','ニュージーランド'],
+    countries: [
+      { flag:'🇧🇪', nameJa:'ベルギー',
+        nameEn:'BELGIUM &nbsp;|&nbsp; フライドポテト発祥の国',
+        stats:[
+          { num:'ベルギー発祥', desc:'<b>フライドポテトはフランスではなくベルギーが発明</b><br>「フレンチ」の名はベルギーへの無理解から。本家はベルギーのリエージュ周辺とされる' },
+          { num:'1,500種超', desc:'<b>国産ビールの種類</b><br>小国ベルギーで1,500種以上のビールが醸造。トラピスト修道院ビールも世界的に有名' },
+          { num:'世界最大', desc:'<b>ブリュッセル正義宮（法廷）：世界最大の司法建物</b><br>1866〜1883年建設。エッフェル塔と同時期にヨーロッパの司法の象徴として建てられた' },
+        ],
+        caption:'3つの公用語（仏・蘭・独）を持つ小国——EUとNATOの本部がここにある' },
+      { flag:'🇪🇬', nameJa:'エジプト',
+        nameEn:'EGYPT &nbsp;|&nbsp; 文明の母',
+        stats:[
+          { num:'130基以上', desc:'<b>現存するピラミッドの数</b><br>ギザの3基だけではない。エジプト全土に130基以上が現存する' },
+          { num:'紀元前3000年', desc:'<b>365日カレンダーを発明した最初の文明</b><br>太陽の動きをもとに1年365日を計算。現代の暦の原型を作った' },
+          { num:'法的に平等', desc:'<b>古代エジプトの女性は財産・契約・陪審参加の法的権利を保有</b><br>同時代のギリシャ・ローマ女性と比べ異例の自由を享受していた' },
+        ],
+        caption:'観光客年間1,500万人（2023年）——ツーリズムがGDPの約10%を支える' },
+      { flag:'🇮🇷', nameJa:'イラン',
+        nameEn:'IRAN &nbsp;|&nbsp; ペルシャ文明の継承者',
+        stats:[
+          { num:'世界の90%以上', desc:'<b>サフラン生産量（世界年間250トン中）</b><br>世界で最も高価なスパイスの9割以上がイラン産。1gが数千円の希少品' },
+          { num:'紀元前600年〜', desc:'<b>ポロ競技の発祥地</b><br>当初は軍の騎馬訓練。100人対100人の大規模な競技として始まった' },
+          { num:'世界初', desc:'<b>郵便制度の発祥地（紀元前550年・キュロス大王時代）</b><br>馬を使ったリレー形式の配達網。「ペルシャのメール」が世界に広がった' },
+        ],
+        caption:'27か所のユネスコ世界遺産——ペルシャ帝国の文化はローマ文明にも影響を与えた' },
+      { flag:'🇳🇿', nameJa:'ニュージーランド',
+        nameEn:'NEW ZEALAND &nbsp;|&nbsp; Aotearoa',
+        stats:[
+          { num:'1893年', desc:'<b>女性参政権を世界で初めて認めた国</b><br>オーストラリア（1902年）・フィンランド（1906年）よりも早かった' },
+          { num:'羊が10倍', desc:'<b>人口1人に対して羊が10頭以上</b><br>農業・牧畜が基幹産業のニュージーランドならではの「人より羊が多い国」' },
+          { num:'ヘビなし', desc:'<b>世界で数少ないヘビが生息しない国のひとつ</b><br>陸生の蛇が一種も存在しない——独自の生態系が守られてきた証拠' },
+        ],
+        caption:'国名がMāori語で「Aotearoa（長い白い雲の地）」——ポリネシア人の故郷' },
+    ]
+  },
+  H: {
+    label: 'GROUP H',
+    flags: ['🇪🇸','🇨🇻','🇸🇦','🇺🇾'],
+    names: ['スペイン','カーボベルデ','サウジアラビア','ウルグアイ'],
+    countries: [
+      { flag:'🇪🇸', nameJa:'スペイン',
+        nameEn:'SPAIN &nbsp;|&nbsp; ユーロ2024覇者',
+        stats:[
+          { num:'歌詞なし', desc:'<b>国歌「ラ・マルチャ・レアル」に公式歌詞が存在しない</b><br>選手が口を閉じたまま入場式を迎える——スペイン語が国語なのに「歌えない国歌」' },
+          { num:'4億6000万人', desc:'<b>スペイン語ネイティブ話者数（世界2位）</b><br>英語の3位を上回る。スペインよりラテンアメリカの方が話者が多い' },
+          { num:'年150万t', desc:'<b>オリーブオイル生産量 世界1位</b><br>世界の約45%を生産。次点イタリアを大きく引き離す' },
+        ],
+        caption:'バスク語：他のどの言語とも系統的関係がないヨーロッパ最古の謎の言語' },
+      { flag:'🇨🇻', nameJa:'カーボベルデ',
+        nameEn:'CABO VERDE &nbsp;|&nbsp; 2026年W杯初出場',
+        stats:[
+          { num:'初出場', desc:'<b>W杯史上最小規模の出場国のひとつ（人口約55万）</b><br>10の島々からなる西アフリカの島国が2026年に初の世界舞台へ' },
+          { num:'国内の3倍', desc:'<b>海外在住カーボベルデ人が150万人以上（国内人口の約3倍）</b><br>ポルトガル・オランダ・アメリカ等に大規模なディアスポラを形成' },
+          { num:'UNESCO登録', desc:'<b>モルナ（morna）音楽：UNESCO無形文化遺産</b><br>セザリア・エヴォラが世界的に広めた哀愁の歌。ポルトガルのファドと親戚関係' },
+        ],
+        caption:'「緑の岬（カーボベルデ）」という名だが実際は乾燥気候——名前の由来は発見時の植生' },
+      { flag:'🇸🇦', nameJa:'サウジアラビア',
+        nameEn:'SAUDI ARABIA &nbsp;|&nbsp; イスラムの聖地',
+        stats:[
+          { num:'2か所', desc:'<b>イスラムの二大聖地（メッカ・メディナ）を擁する唯一の国</b><br>毎年Hajjに200万人以上が世界中から訪れる' },
+          { num:'2018年まで', desc:'<b>世界唯一の「女性の自動車運転禁止国」だった</b><br>2018年の法改正まで、地球上で唯一女性がハンドルを握れなかった' },
+          { num:'65万km²', desc:'<b>ルブアルハリ（空の四分の一）：世界最大の連続砂砂漠</b><br>砂丘が250mに達する大砂漠。サウジアラビア南部に広がる「地球の砂漠の王」' },
+        ],
+        caption:'2034年W杯の開催国——史上初の3か国以上による大陸をまたいだ大会になるとも' },
+      { flag:'🇺🇾', nameJa:'ウルグアイ',
+        nameEn:'URUGUAY &nbsp;|&nbsp; 第1回W杯優勝国',
+        stats:[
+          { num:'1930年優勝', desc:'<b>第1回FIFAワールドカップの開催国かつ優勝国</b><br>決勝でアルゼンチンを4-2で破った——サッカーの歴史はここから始まった' },
+          { num:'約6分', desc:'<b>国歌の演奏時間（世界最長）</b><br>「東部人よ、祖国か死か」——フルバージョンで演奏すると約6分かかる' },
+          { num:'9〜10kg/人・年', desc:'<b>マテ茶消費量 世界1位</b><br>ウルグアイ人は年間9〜10kgのマテ茶を消費。国民的飲料として文化に根付く' },
+        ],
+        caption:'腐敗度最低・最少腐敗の南米国——識字率98%超、学校のPCは全員無料配布' },
+    ]
+  },
+  I: {
+    label: 'GROUP I',
+    flags: ['🇫🇷','🇸🇳','🇮🇶','🇳🇴'],
+    names: ['フランス','セネガル','イラク','ノルウェー'],
+    countries: [
+      { flag:'🇫🇷', nameJa:'フランス',
+        nameEn:'FRANCE &nbsp;|&nbsp; 世界最多訪問国',
+        stats:[
+          { num:'12タイムゾーン', desc:'<b>世界最多タイムゾーン数（米国・ロシアを上回る）</b><br>海外県・海外領土が世界中に点在するため。本土はわずか1タイムゾーン' },
+          { num:'年間1億人超', desc:'<b>観光客数 世界1位（2024年）</b><br>人口6800万の国に1億人以上が訪れる——地球で最も「来られる国」' },
+          { num:'一時停止なし', desc:'<b>パリ市内に一時停止標識が1枚もない</b><br>「プライオリティ・ア・ドロワット」（右側優先）ルールで交差点を管理' },
+        ],
+        caption:'英語語彙の約30%がフランス語由来——ノルマン征服（1066年）が英語を変えた' },
+      { flag:'🇸🇳', nameJa:'セネガル',
+        nameEn:'SENEGAL &nbsp;|&nbsp; 西アフリカの民主主義の灯台',
+        stats:[
+          { num:'2002年', desc:'<b>W杯初出場で当時世界王者フランスを撃破→準々決勝進出</b><br>初出場国が優勝国に勝利した歴史的番狂わせ。今もアフリカ史上の名勝負' },
+          { num:'独立後クーデターなし', desc:'<b>1960年独立以来、軍事クーデターが一度も起きていない</b><br>アフリカで最も安定した民主主義のひとつとして評価される' },
+          { num:'最大12万L', desc:'<b>バオバブの木：幹に最大12万リットルの水を蓄える</b><br>セネガルの国立公園に群生。「逆さまの木」として神話・文化の中心的存在' },
+        ],
+        caption:'ダカール・ラリー（旧パリ・ダカール）の終点として世界に名を轟かせた' },
+      { flag:'🇮🇶', nameJa:'イラク',
+        nameEn:'IRAQ &nbsp;|&nbsp; 文明の発祥地',
+        stats:[
+          { num:'紀元前5000年', desc:'<b>メソポタミア文明発祥地（世界最古の文明のひとつ）</b><br>チグリス・ユーフラテス川流域に「肥沃な三日月地帯」——人類初の都市が生まれた場所' },
+          { num:'40年ぶり', desc:'<b>1986年メキシコ大会以来40年ぶりのW杯出場</b><br>当時と同じメキシコ開催という不思議な巡り合わせ' },
+          { num:'未勝利', desc:'<b>W杯通算成績：1勝もなく今大会に挑む</b><br>1986年大会に出場するも3試合0勝0分3敗——今大会が悲願の初勝利を狙う舞台' },
+        ],
+        caption:'楔形文字・車輪・灌漑農業——「知恵の都」バグダードは9世紀に世界最大都市だった' },
+      { flag:'🇳🇴', nameJa:'ノルウェー',
+        nameEn:'NORWAY &nbsp;|&nbsp; 冬季五輪王国',
+        stats:[
+          { num:'冬季五輪最多', desc:'<b>冬季オリンピック史上最多メダル獲得国（405個・金148個）</b><br>人口540万の国が冬季五輪で全世界を圧倒するスポーツ強国' },
+          { num:'4000年前', desc:'<b>スキーの発祥地（ノルウェーの岩絵に証拠）</b><br>北欧の冬を生き抜く知恵として誕生したスキーが、今や世界的スポーツに' },
+          { num:'1899年', desc:'<b>ペーパークリップはノルウェー人の発明（ヨハン・ファーラー）</b><br>世界中のオフィスで使われる文房具が北欧の発明品' },
+        ],
+        caption:'1998年以来28年ぶりのW杯出場——ハーランドが率いる「黄金世代」で参戦' },
+    ]
+  },
+  J: {
+    label: 'GROUP J',
+    flags: ['🇦🇷','🇩🇿','🇦🇹','🇯🇴'],
+    names: ['アルゼンチン','アルジェリア','オーストリア','ヨルダン'],
+    countries: [
+      { flag:'🇦🇷', nameJa:'アルゼンチン',
+        nameEn:'ARGENTINA &nbsp;|&nbsp; 前回チャンピオン',
+        stats:[
+          { num:'世界1位', desc:'<b>精神科医師数（人口10万人あたり286人）</b><br>精神分析大国アルゼンチン。ブエノスアイレスはセラピーが「普通の習慣」の都市' },
+          { num:'400年以上の歴史', desc:'<b>国技「パト」：馬上でボールをゴールに投げ込む競技</b><br>ガウチョ文化から生まれた。ポロとバスケットを足したような独特の競技' },
+          { num:'約47kg/人・年', desc:'<b>牛肉消費量 世界最高水準</b><br>国内の牛（5000万頭以上）が人口（4600万人）を超える。肉食文化の象徴' },
+        ],
+        caption:'タンゴの発祥地・アコンカグア山（南米最高峰6,961m）——南米の巨人が連覇を狙う' },
+      { flag:'🇩🇿', nameJa:'アルジェリア',
+        nameEn:'ALGERIA &nbsp;|&nbsp; サハラ砂漠の国',
+        stats:[
+          { num:'国土の85%', desc:'<b>国土の大部分がサハラ砂漠</b><br>アフリカ最大の国土（238万km²）の85%が砂漠——人口の多くは北部沿岸に集中' },
+          { num:'100万人以上', desc:'<b>対フランス独立戦争（1954〜62年）の犠牲者</b><br>8年間の過酷な独立闘争。その記憶は今もフランスとの関係に影を落とす' },
+          { num:'2回', desc:'<b>アフリカネイションズカップ優勝（1990・2019年）</b><br>29年を経て再び戴冠——2026年は2014年以来のW杯で「3度目の優勝」を狙う' },
+        ],
+        caption:'サハラ砂漠は面積が広がり続けている——気候変動の影響で年々砂漠化が進む' },
+      { flag:'🇦🇹', nameJa:'オーストリア',
+        nameEn:'AUSTRIA &nbsp;|&nbsp; 音楽の都の国',
+        stats:[
+          { num:'4人の巨匠', desc:'<b>モーツァルト・シューベルト・ブルックナー・マーラー——クラシック音楽の宝庫</b><br>ベートーヴェン・ブラームスも活躍の地としたウィーンは「音楽の世界の首都」' },
+          { num:'120億本以上/年', desc:'<b>Red Bull：オーストリア発祥のエナジードリンクが世界最多販売</b><br>1987年発売のアイデアがタイの飲料から。今や年間120億本を世界で販売' },
+          { num:'1898年以降', desc:'<b>フロイトの精神分析：ウィーンで生まれ世界を変えた</b><br>ジークムント・フロイトがウィーンで「夢判断」発表——20世紀の心の革命' },
+        ],
+        caption:'1998年以来28年ぶりのW杯出場——スイスとの隣国対決を避けた組み合わせに' },
+      { flag:'🇯🇴', nameJa:'ヨルダン',
+        nameEn:'JORDAN &nbsp;|&nbsp; 中東の十字路',
+        stats:[
+          { num:'世界新7不思議', desc:'<b>ペトラ：岩を刻み込んで作られた「バラ色の都市」</b><br>紀元前4世紀のナバテア王国の都——砂岩の崖に彫られた神殿都市' },
+          { num:'海面下432m', desc:'<b>死海：地球上で最も低い場所（海抜マイナス432m）</b><br>塩分濃度が通常の海の10倍——人間が沈まない「浮く海」' },
+          { num:'初出場', desc:'<b>W杯初出場（ヨルダン史上最大のサッカーの快挙）</b><br>2023年アジアカップ準優勝で実力を証明した新星が世界舞台へ' },
+        ],
+        caption:'キリスト洗礼の地（ヨルダン川西岸）がユネスコ世界遺産に登録されている' },
+    ]
+  },
+  K: {
+    label: 'GROUP K',
+    flags: ['🇵🇹','🇨🇩','🇺🇿','🇨🇴'],
+    names: ['ポルトガル','コンゴ民主共和国','ウズベキスタン','コロンビア'],
+    countries: [
+      { flag:'🇵🇹', nameJa:'ポルトガル',
+        nameEn:'PORTUGAL &nbsp;|&nbsp; 大航海時代の先駆者',
+        stats:[
+          { num:'9か国の公用語', desc:'<b>ポルトガル語：9か国の公用語（話者2億5000万人超）</b><br>ブラジル・アンゴラ・モザンビーク等。小国なのに世界語を持つ大航海の遺産' },
+          { num:'世界の50%以上', desc:'<b>コルク生産量</b><br>コルクは地中海のコルクガシから採取される。ポルトガルが世界の半分以上を供給' },
+          { num:'16世紀伝来', desc:'<b>天ぷらはポルトガル人が日本に伝えた料理</b><br>ポルトガル語「テンポーラ（Têmporas）」が語源——長崎のポルトガル商人が伝えた' },
+        ],
+        caption:'国境が1139年から変わっていない——ヨーロッパ最古の国境の一つ' },
+      { flag:'🇨🇩', nameJa:'コンゴ民主共和国',
+        nameEn:'DR CONGO &nbsp;|&nbsp; 1974年以来の出場',
+        stats:[
+          { num:'1974年以来', desc:'<b>前回W杯出場は「ザイール」の国名だった（52年前）</b><br>1974年西ドイツ大会：3試合0勝0分3敗14失点0得点——今大会は歴史的リベンジ戦' },
+          { num:'アフリカ最大', desc:'<b>熱帯雨林面積：アフリカ最大（地球の肺のひとつ）</b><br>アマゾンに次ぐ世界2位の熱帯雨林——地球の炭素吸収に不可欠な「緑の大陸」' },
+          { num:'200以上', desc:'<b>国内で使われる言語の数</b><br>コンゴ川流域に200以上の言語が並存。フランス語が公用語だが母語は多様' },
+        ],
+        caption:'人口1億人超・アフリカ2位の国土——未開発の資源大国が半世紀ぶりに世界へ' },
+      { flag:'🇺🇿', nameJa:'ウズベキスタン',
+        nameEn:'UZBEKISTAN &nbsp;|&nbsp; シルクロードの心臓',
+        stats:[
+          { num:'初出場', desc:'<b>W杯初出場（7度目の挑戦でついに本大会へ）</b><br>元W杯王者イタリア代表監督ファビオ・カンナバーロが指揮して掴んだ初切符' },
+          { num:'UNESCO多数', desc:'<b>シルクロードの中心地（サマルカンド・ブハラ・ヒヴァ）</b><br>かつて世界で最も輝いた都市たちが今もユネスコ世界遺産として息づく' },
+          { num:'紀元前329年', desc:'<b>サマルカンドはアレクサンダー大王も征服した古都</b><br>「東洋の真珠」と呼ばれた都市——シルク・陶磁器・香辛料が行き交った' },
+        ],
+        caption:'旧ソ連から独立（1991年）——中央アジア最多人口3,700万人の大国' },
+      { flag:'🇨🇴', nameJa:'コロンビア',
+        nameEn:'COLOMBIA &nbsp;|&nbsp; 生物多様性の王国',
+        stats:[
+          { num:'世界1位', desc:'<b>鳥類種数 世界1位（約1,900種以上）</b><br>地球上の鳥の約20%がコロンビアに生息。生物多様性の宝庫' },
+          { num:'世界3位', desc:'<b>コーヒー生産量（ブラジル・ベトナムに次ぐ）</b><br>「コロンビアコーヒー」のブランドは世界最高峰。山岳地帯の気候が秘訣' },
+          { num:'1982年', desc:'<b>ガブリエル・ガルシア=マルケスのノーベル文学賞受賞</b><br>「百年の孤独」の作者——マジックリアリズムを世界文学に確立した' },
+        ],
+        caption:'2014年W杯：ハメス・ロドリゲスがゴールデンブーツ獲得——コロンビア初の快挙' },
+    ]
+  },
+  L: {
+    label: 'GROUP L',
+    flags: ['🏴󠁧󠁢󠁥󠁮󠁧󠁿','🇭🇷','🇬🇭','🇵🇦'],
+    names: ['イングランド','クロアチア','ガーナ','パナマ'],
+    countries: [
+      { flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', nameJa:'イングランド',
+        nameEn:'ENGLAND &nbsp;|&nbsp; サッカー発祥の地',
+        stats:[
+          { num:'1863年', desc:'<b>サッカー（フットボール）の発祥地</b><br>フットボール協会（FA）創設年。ルールを定め世界に広めた「サッカーの母国」' },
+          { num:'約2万語', desc:'<b>シェイクスピアが使った語彙（現代英語話者平均の3〜4倍）</b><br>約2,000語を英語に新たに加えた——「Bedroom」「lonely」「bedroom」も彼の造語' },
+          { num:'1863年開業', desc:'<b>世界最古の地下鉄：ロンドン地下鉄（Underground）</b><br>蒸気機関車で始まった地下鉄が今もロンドンの大動脈として活躍' },
+        ],
+        caption:'1966年W杯優勝（自国開催）——ハーフィールドのハットトリックは今も語り継がれる' },
+      { flag:'🇭🇷', nameJa:'クロアチア',
+        nameEn:'CROATIA &nbsp;|&nbsp; 人口390万の強豪',
+        stats:[
+          { num:'17世紀発明', desc:'<b>ネクタイ（クラバット）はクロアチア人が発明</b><br>17世紀のクロアチア兵が首に巻いたスカーフがフランスで「クラバット」として流行' },
+          { num:'2018年準優勝', desc:'<b>人口390万の小国がW杯決勝に進出</b><br>フランスに2-4で敗れたが、モドリッチがゴールデンボール受賞——小国の奇跡' },
+          { num:'ゲームの舞台', desc:'<b>ドゥブロブニク：「ゲーム・オブ・スローンズ」の主要ロケ地</b><br>「キングズランディング」として使われた旧市街がユネスコ世界遺産' },
+        ],
+        caption:'40歳のモドリッチが今大会でも200キャップ近くに迫る——伝説の現役' },
+      { flag:'🇬🇭', nameJa:'ガーナ',
+        nameEn:'GHANA &nbsp;|&nbsp; アフリカ初の独立国（サブサハラ）',
+        stats:[
+          { num:'1957年独立', desc:'<b>サブサハラアフリカで初めて独立した国</b><br>クワメ・エンクルマの指導のもと独立——「アフリカ解放の光」として歴史に刻まれた' },
+          { num:'カカオ世界2位', desc:'<b>カカオ生産量（コートジボワールに次ぐ）</b><br>「ゴールドコースト」の歴史的名称通り、天然資源に恵まれた西アフリカの要衝' },
+          { num:'2010年QF', desc:'<b>2010年W杯準々決勝：スアレスの「手のゴール」で涙</b><br>ガーナの勝利を阻んだ一手が今も語り継がれる——アフリカ大陸初のベスト4を逃した瞬間' },
+        ],
+        caption:'現在のGDP成長率はアフリカ上位——「アフリカの成功モデル」との評価も高い' },
+      { flag:'🇵🇦', nameJa:'パナマ',
+        nameEn:'PANAMA &nbsp;|&nbsp; 二つの海をつなぐ国',
+        stats:[
+          { num:'1914年開通', desc:'<b>パナマ運河：世界の海上貿易の約3〜5%を担う大動脈</b><br>大西洋と太平洋をつなぐ全長80kmの水路——100年以上、世界経済を支える' },
+          { num:'エクアドル産', desc:'<b>「パナマ帽」はパナマではなくエクアドル産</b><br>19世紀にパナマで売られていたためこの名が定着。本場はエクアドルのモンテクリスティ' },
+          { num:'103m', desc:'<b>世界最長の旗竿（パナマシティ）</b><br>103mの旗竿に巨大なパナマ国旗が翻る——ギネス世界記録に認定' },
+        ],
+        caption:'2018年W杯（初出場）でイングランドに敗れた因縁の再対決——グループLで雪辱なるか' },
+    ]
+  }
+};
+
+/* ─────────────────────────────────────────
+   BUILD HOME GRID  (A–L, 12 groups)
+───────────────────────────────────────── */
+const grid = document.getElementById('group-grid');
+'ABCDEFGHIJKL'.split('').forEach(key => {
+  const d = DATA[key];
+  const card = document.createElement('div');
+  card.className = 'group-card ' + (d ? 'active' : 'locked');
+  card.innerHTML = d
+    ? `<div class="card-label">GROUP ${key}</div>
+       <div class="card-flags">${d.flags.join(' ')}</div>
+       <div class="card-names">${d.names.join(' · ')}</div>`
+    : `<div class="card-label">GROUP ${key}</div>
+       <div class="locked-placeholder">準備中</div>`;
+  if (d) card.addEventListener('click', () => showGroup(key));
+  grid.appendChild(card);
+});
+
+/* ─────────────────────────────────────────
+   SLIDES LOGIC
+───────────────────────────────────────── */
+let currentSlide = 0;
+
+function showGroup(key) {
+  currentSlide = 0;
+  const group = DATA[key];
+  const container = document.getElementById('slides-container');
+  container.innerHTML = '';
+
+  group.countries.forEach((c, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'slide' + (i === 0 ? ' active' : '');
+    slide.innerHTML = `
+      <div class="top-bar">
+        <div class="top-left">
+          <span class="back-btn">← GROUP選択</span>
+          <span class="top-label">🏆 FIFA WORLD CUP 2026 — ${group.label}</span>
+        </div>
+        <div class="top-right">
+          <span class="schedule-btn">📅 対戦表</span>
+          <span class="page-num">${i + 1} / 4</span>
+        </div>
+      </div>
+      <div class="slide-body">
+        <div class="slide-left">
+          <div class="country-header">
+            <span class="flag">${c.flag}</span>
+            <div>
+              <div class="country-name-ja">${c.nameJa}</div>
+              <div class="country-name-en">${c.nameEn}</div>
+            </div>
+          </div>
+          <div class="stats">
+            ${c.stats.map(s => `
+              <div class="stat-row">
+                <span class="stat-num">${s.num}</span>
+                <span class="stat-desc">${s.desc}</span>
+              </div>`).join('')}
+          </div>
+          <div class="caption">${c.caption}</div>
+        </div>
+        <div class="slide-right">
+          <svg class="mini-map-svg" data-country="${c.nameJa}"></svg>
+          <div class="mini-map-btn" data-country="${c.nameJa}">🗺 世界地図</div>
+        </div>
+      </div>
+      <div class="dots">
+        ${group.countries.map((_, j) =>
+          `<span class="dot${j === i ? ' active' : ''}" data-idx="${j}"></span>`
+        ).join('')}
+      </div>
+      <div class="nav-hint">← → KEY / ESC: グループ選択 / CLICK TO ADVANCE</div>`;
+    container.appendChild(slide);
+  });
+
+  container.querySelectorAll('.back-btn').forEach(btn =>
+    btn.addEventListener('click', e => { e.stopPropagation(); goHome(); })
+  );
+  container.querySelectorAll('.dot').forEach(dot =>
+    dot.addEventListener('click', e => { e.stopPropagation(); goToSlide(+dot.dataset.idx); })
+  );
+  container.querySelectorAll('.mini-map-btn').forEach(btn =>
+    btn.addEventListener('click', e => { e.stopPropagation(); showMapHighlight(btn.dataset.country); })
+  );
+  container.querySelectorAll('.mini-map-svg').forEach(svgEl =>
+    renderMiniMap(svgEl, svgEl.dataset.country)
+  );
+
+  const schedPanel = buildSchedulePanel(key, group);
+  container.appendChild(schedPanel);
+  container.querySelectorAll('.schedule-btn').forEach(btn =>
+    btn.addEventListener('click', e => { e.stopPropagation(); schedPanel.classList.toggle('hidden'); })
+  );
+
+  document.getElementById('map-screen').classList.add('hidden');
+  document.getElementById('home').classList.add('hidden');
+  container.classList.remove('hidden');
+}
+
+function buildSchedulePanel(key, group) {
+  const matchdays = [
+    [[0,1],[2,3]],
+    [[0,2],[1,3]],
+    [[0,3],[1,2]]
+  ];
+  const panel = document.createElement('div');
+  panel.className = 'schedule-panel hidden';
+  panel.innerHTML = `
+    <div class="schedule-inner">
+      <div class="sch-header">
+        <span class="sch-title">📅 ${group.label} — グループステージ 対戦表</span>
+        <span class="sch-close">✕ 閉じる</span>
+      </div>
+      ${matchdays.map((matches, md) => `
+        <div class="matchday-block">
+          <div class="matchday-label">MATCHDAY ${md + 1}</div>
+          ${matches.map(([a, b]) => `
+            <div class="match-row">
+              <span class="match-team">${group.countries[a].flag} ${group.countries[a].nameJa}</span>
+              <span class="match-vs">VS</span>
+              <span class="match-team">${group.countries[b].flag} ${group.countries[b].nameJa}</span>
+            </div>`).join('')}
+        </div>`).join('')}
+    </div>`;
+  panel.querySelector('.sch-close').addEventListener('click', e => {
+    e.stopPropagation(); panel.classList.add('hidden');
+  });
+  panel.addEventListener('click', e => {
+    if (!e.target.closest('.schedule-inner')) panel.classList.add('hidden');
+  });
+  return panel;
+}
+
+function goHome() {
+  document.getElementById('slides-container').classList.add('hidden');
+  document.getElementById('home').classList.remove('hidden');
+}
+
+function slides() {
+  return document.getElementById('slides-container').querySelectorAll('.slide');
+}
+function goToSlide(n) {
+  const s = slides();
+  s[currentSlide].classList.remove('active');
+  currentSlide = (n + s.length) % s.length;
+  s[currentSlide].classList.add('active');
+}
+function next() { goToSlide(currentSlide + 1); }
+function prev() { goToSlide(currentSlide - 1); }
+
+/* ─────────────────────────────────────────
+   EVENT LISTENERS
+───────────────────────────────────────── */
+document.body.addEventListener('click', e => {
+  if (document.getElementById('slides-container').classList.contains('hidden')) return;
+  if (e.target.closest('.dots') || e.target.closest('.back-btn') || e.target.closest('.slide-right') || e.target.closest('.schedule-panel') || e.target.closest('.schedule-btn')) return;
+  e.clientX >= window.innerWidth / 2 ? next() : prev();
+});
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('pk-overlay').classList.contains('hidden')) {
+    if (e.key === 'Escape') {
+      document.getElementById('pk-overlay').classList.add('hidden');
+      document.getElementById('home').classList.remove('hidden');
+    }
+    return;
+  }
+  const searchOpen = !document.getElementById('search-overlay').classList.contains('hidden');
+
+  // ── Search overlay keys ──
+  if (searchOpen) {
+    const els = document.querySelectorAll('#search-results .search-result');
+    if (e.key === 'Escape') { closeSearch(); return; }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selIdx = Math.min(selIdx + 1, els.length - 1);
+      updateSelection(); return;
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selIdx = Math.max(selIdx - 1, 0);
+      updateSelection(); return;
+    }
+    if (e.key === 'Enter' && els[selIdx]) {
+      jumpTo(els[selIdx].dataset.group, +els[selIdx].dataset.slide); return;
+    }
+    return; // block all other keys while search is open
+  }
+
+  // ── Slide keys ──
+  if (!document.getElementById('slides-container').classList.contains('hidden')) {
+    const openPanel = document.querySelector('.schedule-panel:not(.hidden)');
+    if (!openPanel) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+    }
+    if (e.key === 'Escape') {
+      if (openPanel) openPanel.classList.add('hidden');
+      else goHome();
+    }
+  }
+
+  // ── Global: "/" to open search ──
+  if (e.key === '/' && !e.metaKey && !e.ctrlKey) { e.preventDefault(); openSearch(); }
+});
+
+/* ─────────────────────────────────────────
+   MAP
+───────────────────────────────────────── */
+const COORDS = {
+  // [lat, lon]
+  'メキシコ':           [23.6, -102.6],
+  '南アフリカ':         [-30,   25],
+  '韓国':               [37,   127.5],
+  'チェコ':             [50,    15.5],
+  'カナダ':             [56,   -96],
+  'ボスニア・ヘルツェゴビナ': [44, 17],
+  'カタール':           [25,    51.5],
+  'スイス':             [47,     8],
+  'ブラジル':           [-10,  -55],
+  'モロッコ':           [32,    -6],
+  'ハイチ':             [19,   -72.5],
+  'スコットランド':     [57,    -4],
+  'アメリカ':           [38,   -97],
+  'パラグアイ':         [-23,  -58],
+  'オーストラリア':     [-27,  133],
+  'トルコ':             [39,    35],
+  'ドイツ':             [51,    10],
+  'キュラソー':         [12,   -69],
+  'コートジボワール':   [7,    -5.5],
+  'エクアドル':         [-2,   -78],
+  'オランダ':           [52,     5],
+  '日本':               [36,   138],
+  'スウェーデン':       [62,    15],
+  'チュニジア':         [34,     9],
+  'ベルギー':           [50,     4],
+  'エジプト':           [26,    30],
+  'イラン':             [32,    53],
+  'ニュージーランド':   [-42,  174],
+  'スペイン':           [40,    -4],
+  'カーボベルデ':       [16,   -24],
+  'サウジアラビア':     [24,    45],
+  'ウルグアイ':         [-33,  -56],
+  'フランス':           [46,     2],
+  'セネガル':           [14,   -14],
+  'イラク':             [33,    44],
+  'ノルウェー':         [62,    10],
+  'アルゼンチン':       [-34,  -64],
+  'アルジェリア':       [28,     2],
+  'オーストリア':       [47,    14],
+  'ヨルダン':           [31,    36],
+  'ポルトガル':         [39,    -8],
+  'コンゴ民主共和国':   [-4,    25],
+  'ウズベキスタン':     [41,    64],
+  'コロンビア':         [4,    -74],
+  'イングランド':       [52,    -1],
+  'クロアチア':         [45,    16],
+  'ガーナ':             [8,     -2],
+  'パナマ':             [9,    -80],
+};
+
+// Japanese name → ISO 3166-1 numeric (for mini-map highlighting)
+const NAME_TO_ISO = {
+  'メキシコ':484,'南アフリカ':710,'韓国':410,'チェコ':203,
+  'カナダ':124,'ボスニア・ヘルツェゴビナ':70,'カタール':634,'スイス':756,
+  'ブラジル':76,'モロッコ':504,'ハイチ':332,'スコットランド':826,
+  'アメリカ':840,'パラグアイ':600,'オーストラリア':36,'トルコ':792,
+  'ドイツ':276,'キュラソー':531,'コートジボワール':384,'エクアドル':218,
+  'オランダ':528,'日本':392,'スウェーデン':752,'チュニジア':788,
+  'ベルギー':56,'エジプト':818,'イラン':364,'ニュージーランド':554,
+  'スペイン':724,'カーボベルデ':132,'サウジアラビア':682,'ウルグアイ':858,
+  'フランス':250,'セネガル':686,'イラク':368,'ノルウェー':578,
+  'アルゼンチン':32,'アルジェリア':12,'オーストリア':40,'ヨルダン':400,
+  'ポルトガル':620,'コンゴ民主共和国':180,'ウズベキスタン':860,'コロンビア':170,
+  'イングランド':826,'クロアチア':191,'ガーナ':288,'パナマ':591,
+};
+
+// ISO 3166-1 numeric codes for all 48 participating countries
+const PARTICIPATING_ISO = new Set([
+  484,710,410,203,   // A: Mexico, S.Africa, S.Korea, Czechia
+  124, 70,634,756,   // B: Canada, Bosnia, Qatar, Switzerland
+   76,504,332,826,   // C: Brazil, Morocco, Haiti, UK(Scotland+England)
+  840,600, 36,792,   // D: USA, Paraguay, Australia, Turkey
+  276,531,384,218,   // E: Germany, Curaçao, Ivory Coast, Ecuador
+  528,392,752,788,   // F: Netherlands, Japan, Sweden, Tunisia
+   56,818,364,554,   // G: Belgium, Egypt, Iran, New Zealand
+  724,132,682,858,   // H: Spain, Cape Verde, Saudi Arabia, Uruguay
+  250,686,368,578,   // I: France, Senegal, Iraq, Norway
+   32, 12, 40,400,   // J: Argentina, Algeria, Austria, Jordan
+  620,180,860,170,   // K: Portugal, DRC, Uzbekistan, Colombia
+  191,288,591,       // L: Croatia, Ghana, Panama (826=UK already above)
+]);
+
+let worldTopoJson  = null;
+let miniMapSeq     = 0;
+
+async function loadWorldTopo() {
+  if (!worldTopoJson)
+    worldTopoJson = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+  return worldTopoJson;
+}
+
+async function renderMiniMap(svgEl, nameJa) {
+  const topo = await loadWorldTopo();
+  const sz = 260;
+  const coords = COORDS[nameJa];
+  if (!coords) return;
+  const [lat, lon] = coords;
+  const iso = NAME_TO_ISO[nameJa];
+  const uid = ++miniMapSeq;
+  const proj = d3.geoOrthographic()
+    .rotate([-lon, -lat])
+    .scale(sz / 2 - 4)
+    .translate([sz / 2, sz / 2])
+    .clipAngle(90);
+  const path = d3.geoPath().projection(proj);
+  const countries = topojson.feature(topo, topo.objects.countries);
+  const svg = d3.select(svgEl).attr('width', sz).attr('height', sz);
+  svg.append('defs').append('clipPath').attr('id', `mm${uid}`)
+    .append('circle').attr('cx', sz/2).attr('cy', sz/2).attr('r', sz/2 - 1);
+  svg.append('circle').attr('cx', sz/2).attr('cy', sz/2).attr('r', sz/2 - 1)
+    .attr('fill', '#0c1f33').attr('stroke', 'rgba(255,255,255,0.12)').attr('stroke-width', 1);
+  const g = svg.append('g').attr('clip-path', `url(#mm${uid})`);
+  g.append('path').datum({type:'Sphere'}).attr('d', path).attr('fill', '#0c1f33');
+  g.selectAll('path.mc').data(countries.features).join('path').attr('class','mc')
+    .attr('d', path)
+    .attr('fill', d => +d.id === iso ? '#1e6840' : '#1b3a54')
+    .attr('stroke', 'rgba(255,255,255,0.08)').attr('stroke-width', 0.5);
+}
+
+let mapInitialized = false;
+let mapProjection  = null;
+let highlightCountry = null;
+
+function showMapHighlight(nameJa) {
+  highlightCountry = nameJa;
+  showMap();
+}
+
+async function initMap() {
+  if (mapInitialized) { renderMap(); return; }
+  mapInitialized = true;
+  const bodyEl = document.getElementById('map-body');
+  const bw = bodyEl.clientWidth  || 1200;
+  const bh = bodyEl.clientHeight || 628;
+  mapProjection = d3.geoNaturalEarth1().fitSize([bw, bh], {type: 'Sphere'});
+  const path = d3.geoPath().projection(mapProjection);
+  const world = await loadWorldTopo();
+  const countries = topojson.feature(world, world.objects.countries);
+  const svg = d3.select('#map-body').insert('svg', '.map-markers')
+    .style('position', 'absolute').style('inset', '0')
+    .style('width', bw + 'px').style('height', bh + 'px');
+  svg.append('rect').attr('width', bw).attr('height', bh).attr('fill', '#0c1f33');
+  svg.append('path').datum(d3.geoGraticule()()).attr('d', path)
+    .attr('fill', 'none').attr('stroke', 'rgba(255,255,255,0.04)').attr('stroke-width', 0.5);
+  svg.selectAll('path.cp').data(countries.features).join('path').attr('class', 'cp')
+    .attr('d', path)
+    .attr('fill', d => PARTICIPATING_ISO.has(+d.id) ? '#1e6840' : '#1b3a54')
+    .attr('stroke', 'rgba(255,255,255,0.1)').attr('stroke-width', 0.3);
+  renderMap();
+}
+
+function showMap() {
+  document.getElementById('home').classList.add('hidden');
+  document.getElementById('map-screen').classList.remove('hidden');
+  requestAnimationFrame(() => initMap());
+}
+function hideMap() {
+  document.getElementById('map-screen').classList.add('hidden');
+  document.getElementById('home').classList.remove('hidden');
+}
+
+function renderMap() {
+  const container = document.getElementById('map-markers');
+  container.innerHTML = '';
+  Object.entries(DATA).forEach(([groupKey, group]) => {
+    group.countries.forEach((country, slideIdx) => {
+      const coords = COORDS[country.nameJa];
+      if (!coords) return;
+      const [lat, lon] = coords;
+      let left, top;
+      if (mapProjection) {
+        const [px, py] = mapProjection([lon, lat]);
+        left = px + 'px'; top = py + 'px';
+      } else {
+        left = ((lon + 180) / 360 * 100) + '%';
+        top  = ((90 - lat) / 180 * 100)  + '%';
+      }
+      const isHL = (highlightCountry === country.nameJa);
+      const el = document.createElement('div');
+      el.className = 'map-marker' + (isHL ? ' highlighted' : '');
+      el.style.left = left; el.style.top = top;
+      el.innerHTML = `
+        ${isHL ? '<span class="pulse-ring"></span>' : ''}
+        <span class="marker-flag">${country.flag}</span>
+        <div class="marker-tip">
+          <span class="tip-group">${group.label}</span>
+          <span class="tip-name">${country.nameJa}</span>
+        </div>`;
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        highlightCountry = null;
+        hideMap();
+        showGroup(groupKey);
+        goToSlide(slideIdx);
+      });
+      container.appendChild(el);
+    });
+  });
+}
+
+document.getElementById('map-btn').addEventListener('click', () => { highlightCountry = null; showMap(); });
+document.getElementById('rand-btn').addEventListener('click', () => {
+  const keys = Object.keys(DATA);
+  const key = keys[Math.floor(Math.random() * keys.length)];
+  const group = DATA[key];
+  const idx = Math.floor(Math.random() * group.countries.length);
+  const overlay = document.getElementById('dice-overlay');
+  overlay.classList.remove('hidden');
+  setTimeout(() => {
+    overlay.classList.add('hidden');
+    showGroup(key);
+    goToSlide(idx);
+  }, 1500);
+});
+document.getElementById('map-back').addEventListener('click', hideMap);
+
+/* ─────────────────────────────────────────
+   SEARCH
+───────────────────────────────────────── */
+const searchIndex = [];
+Object.entries(DATA).forEach(([groupKey, group]) => {
+  group.countries.forEach((c, slideIdx) => {
+    searchIndex.push({ groupKey, slideIdx, nameJa: c.nameJa, flag: c.flag, groupLabel: group.label });
+  });
+});
+
+let selIdx = -1;
+
+function openSearch() {
+  document.getElementById('search-overlay').classList.remove('hidden');
+  const input = document.getElementById('search-input');
+  input.value = '';
+  selIdx = -1;
+  renderResults('');
+  setTimeout(() => input.focus(), 10);
+}
+
+function closeSearch() {
+  document.getElementById('search-overlay').classList.add('hidden');
+  selIdx = -1;
+}
+
+function renderResults(q) {
+  const container = document.getElementById('search-results');
+  const filtered = q.trim()
+    ? searchIndex.filter(item => item.nameJa.includes(q.trim()))
+    : searchIndex;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="search-empty">「${q}」に一致する国が見つかりません</div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map((item, i) => `
+    <div class="search-result${i === selIdx ? ' selected' : ''}"
+         data-group="${item.groupKey}" data-slide="${item.slideIdx}">
+      <span class="result-flag">${item.flag}</span>
+      <div>
+        <div class="result-name">${item.nameJa}</div>
+        <div class="result-group">${item.groupLabel}</div>
+      </div>
+      <span class="result-arrow">→</span>
+    </div>`).join('');
+
+  container.querySelectorAll('.search-result').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      jumpTo(el.dataset.group, +el.dataset.slide);
+    });
+  });
+}
+
+function jumpTo(groupKey, slideIdx) {
+  closeSearch();
+  showGroup(groupKey);
+  goToSlide(slideIdx);
+}
+
+function updateSelection() {
+  const els = document.querySelectorAll('#search-results .search-result');
+  els.forEach((el, i) => el.classList.toggle('selected', i === selIdx));
+  if (els[selIdx]) els[selIdx].scrollIntoView({ block: 'nearest' });
+}
+
+document.getElementById('search-btn').addEventListener('click', openSearch);
+document.getElementById('search-close').addEventListener('click', closeSearch);
+document.getElementById('search-input').addEventListener('input', e => {
+  selIdx = -1;
+  renderResults(e.target.value);
+});
+
+// Stop clicks inside the modal from closing the overlay
+document.querySelector('.search-modal').addEventListener('click', e => e.stopPropagation());
+// Click backdrop to close
+document.getElementById('search-overlay').addEventListener('click', closeSearch);
+
+/* ─────────────────────────────────────────
+   PK GAME
+───────────────────────────────────────── */
+const _PK_ZONE_COL = [0, 1, 2, 0, 1, 2]; // zone index → column (0=left,1=center,2=right)
+const _PK_TARGETS  = [
+  {l:17,t:22},{l:50,t:22},{l:83,t:22},
+  {l:17,t:59},{l:50,t:59},{l:83,t:59}
+]; // % positions within .pk-goal-wrap
+const PK_ROUNDS = 5;
+let _pkScore = 0, _pkRound = 0, _pkResults = [], _pkBusy = false;
+
+function openPKGame() {
+  _pkScore = 0; _pkRound = 0; _pkResults = []; _pkBusy = false;
+  document.getElementById('pk-overlay').classList.remove('hidden');
+  document.getElementById('pk-final').classList.add('hidden');
+  ['home','slides-container','map-screen'].forEach(id =>
+    document.getElementById(id).classList.add('hidden'));
+  _pkResetRound();
+  _pkUpdateDots();
+}
+
+function _pkResetRound() {
+  document.getElementById('pk-keeper').className = 'pk-keeper';
+  const ball = document.getElementById('pk-ball');
+  ball.className = 'pk-ball';
+  ball.style.left = '50%'; ball.style.top = '92%'; ball.style.fontSize = '30px';
+  document.getElementById('pk-flash').className = 'pk-flash';
+  const grid = document.getElementById('pk-zones-grid');
+  grid.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const z = document.createElement('div');
+    z.className = 'pk-zone';
+    z.addEventListener('click', () => _pkShoot(i));
+    grid.appendChild(z);
+  }
+  document.getElementById('pk-prompt').textContent = '枠内をクリックしてシュート';
+}
+
+function _pkShoot(zoneIdx) {
+  if (_pkBusy || _pkRound >= PK_ROUNDS) return;
+  _pkBusy = true;
+  document.getElementById('pk-prompt').textContent = '';
+  document.querySelectorAll('.pk-zone').forEach(z => z.classList.add('pk-inactive'));
+
+  const keeperZone = Math.floor(Math.random() * 6);
+  const isGoal     = zoneIdx !== keeperZone;
+
+  document.getElementById('pk-keeper').classList.add('z' + keeperZone);
+
+  const ball = document.getElementById('pk-ball');
+  const tgt  = _PK_TARGETS[zoneIdx];
+  setTimeout(() => {
+    ball.classList.add('fly');
+    ball.style.left     = tgt.l + '%';
+    ball.style.top      = tgt.t + '%';
+    ball.style.fontSize = '18px';
+  }, 60);
+
+  setTimeout(() => {
+    if (isGoal) _pkScore++;
+    _pkResults.push(isGoal);
+    _pkRound++;
+    const flash = document.getElementById('pk-flash');
+    flash.textContent = isGoal ? 'GOAL! ⚽' : 'SAVED 🧤';
+    flash.className = 'pk-flash on ' + (isGoal ? 'goal-msg' : 'saved-msg');
+    _pkUpdateDots();
+  }, 520);
+
+  setTimeout(() => {
+    if (_pkRound >= PK_ROUNDS) { _pkShowFinal(); }
+    else { _pkBusy = false; _pkResetRound(); }
+  }, 1250);
+}
+
+function _pkUpdateDots() {
+  const c = document.getElementById('pk-hdr-dots');
+  c.innerHTML = '';
+  for (let i = 0; i < PK_ROUNDS; i++) {
+    const d = document.createElement('div');
+    d.className = 'pk-hdot' +
+      (i < _pkResults.length ? (_pkResults[i] ? ' scored' : ' missed') : '');
+    d.textContent = i < _pkResults.length ? (_pkResults[i] ? '⚽' : '✕') : '';
+    c.appendChild(d);
+  }
+}
+
+function _pkShowFinal() {
+  const msgs = ['次は入れよう…', 'もう少し!', 'まずまず!', 'ナイス!', '惜しかった!', '完璧! 🏆'];
+  document.getElementById('pk-final-score').textContent = `${_pkScore} / ${PK_ROUNDS}`;
+  document.getElementById('pk-final-msg').textContent   = msgs[_pkScore];
+  document.getElementById('pk-final-sub').textContent   = `成功率 ${Math.round(_pkScore / PK_ROUNDS * 100)}%`;
+  document.getElementById('pk-final').classList.remove('hidden');
+}
+
+document.getElementById('pk-btn').addEventListener('click', openPKGame);
+document.getElementById('pk-back').addEventListener('click', () => {
+  document.getElementById('pk-overlay').classList.add('hidden');
+  document.getElementById('home').classList.remove('hidden');
+});
+document.getElementById('pk-retry').addEventListener('click', openPKGame);
+document.getElementById('pk-exit').addEventListener('click', () => {
+  document.getElementById('pk-overlay').classList.add('hidden');
+  document.getElementById('home').classList.remove('hidden');
+});
+
+/* ─────────────────────────────────────────
+   SCALE TO VIEWPORT
+───────────────────────────────────────── */
+const wrapper = document.getElementById('wrapper');
+function fitScale() {
+  const s = Math.min(window.innerWidth / 1200, window.innerHeight / 675);
+  wrapper.style.transform = `scale(${s})`;
+}
+fitScale();
+window.addEventListener('resize', fitScale);
+
+// Pre-fetch TopoJSON so mini-maps appear instantly when a group is first opened
+loadWorldTopo().catch(() => {});
+</script>
+</body>
+</html>

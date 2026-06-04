@@ -504,6 +504,46 @@
     transition: color 0.15s, border-color 0.15s;
   }
   .pk-btn-secondary:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+
+  /* ── TREASURE EASTER EGG ── */
+  #treasure-overlay {
+    position: absolute; inset: 0; z-index: 60;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at 50% 55%, #2a1500 0%, #080600 100%);
+    gap: 16px;
+  }
+  #treasure-overlay.hidden { display: none; }
+  .trs-close {
+    position: absolute; top: 20px; right: 28px;
+    font-size: 11px; font-weight: 700; color: #8a7040; cursor: pointer;
+    padding: 4px 12px; border: 1px solid rgba(200,160,60,0.3); border-radius: 4px;
+    letter-spacing: 0.08em; transition: color 0.15s, border-color 0.15s;
+  }
+  .trs-close:hover { color: #f0c040; border-color: rgba(240,192,64,0.6); }
+  .trs-chest { font-size: 96px; animation: trs-bob 2s ease-in-out infinite; }
+  @keyframes trs-bob {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50%       { transform: translateY(-14px) rotate(3deg); }
+  }
+  .trs-title {
+    font-size: 34px; font-weight: 900; letter-spacing: 0.06em;
+    color: #f0c040; text-shadow: 0 0 30px rgba(240,192,64,0.9), 0 0 80px rgba(240,160,0,0.4);
+  }
+  .trs-sub { font-size: 13px; color: #b08830; letter-spacing: 0.1em; }
+  .trs-card {
+    max-width: 520px; background: rgba(240,192,64,0.06);
+    border: 1px solid rgba(240,192,64,0.18); border-radius: 10px;
+    padding: 20px 28px; font-size: 15px; color: #d4a838; line-height: 1.85; text-align: center;
+  }
+  .trs-card b { color: #f0c040; }
+  .trs-coins {
+    font-size: 26px; letter-spacing: 10px;
+    animation: trs-coins 2.4s ease-in-out infinite;
+  }
+  @keyframes trs-coins {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; filter: drop-shadow(0 0 10px rgba(240,192,64,0.9)); }
+  }
 </style>
 </head>
 <body>
@@ -582,6 +622,20 @@
         <div class="pk-btn-secondary" id="pk-exit">ホームへ</div>
       </div>
     </div>
+  </div>
+
+  <!-- ══ TREASURE EASTER EGG ══ -->
+  <div id="treasure-overlay" class="hidden">
+    <span class="trs-close" id="trs-close">ESC / 閉じる</span>
+    <div class="trs-chest">🪙</div>
+    <div class="trs-title">海賊の財宝を発見！</div>
+    <div class="trs-sub">🏴‍☠️ &nbsp; You found the hidden treasure &nbsp; 🏴‍☠️</div>
+    <div class="trs-card">
+      18世紀、ハイチ沖の<b>トルトゥーガ島</b>は実在した海賊共和国。<br>
+      ブラックベアード、カリブの海賊たちがここを根城に大西洋を支配した。<br><br>
+      ハイチはW杯の財宝だけでなく、<b>本物の埋蔵金伝説</b>も持つ国だ。
+    </div>
+    <div class="trs-coins">🪙 🪙 🪙 🪙 🪙</div>
   </div>
 
   <!-- ══ DICE OVERLAY ══ -->
@@ -1126,6 +1180,7 @@ const grid = document.getElementById('group-grid');
    SLIDES LOGIC
 ───────────────────────────────────────── */
 let currentSlide = 0;
+let _treasureStep = 0; // Easter egg sequence tracker
 
 function showGroup(key) {
   currentSlide = 0;
@@ -1264,6 +1319,10 @@ document.body.addEventListener('click', e => {
 });
 
 document.addEventListener('keydown', e => {
+  if (!document.getElementById('treasure-overlay').classList.contains('hidden')) {
+    if (e.key === 'Escape') hideTreasure();
+    return;
+  }
   if (!document.getElementById('pk-overlay').classList.contains('hidden')) {
     if (e.key === 'Escape') {
       document.getElementById('pk-overlay').classList.add('hidden');
@@ -1287,8 +1346,12 @@ document.addEventListener('keydown', e => {
       selIdx = Math.max(selIdx - 1, 0);
       updateSelection(); return;
     }
-    if (e.key === 'Enter' && els[selIdx]) {
-      jumpTo(els[selIdx].dataset.group, +els[selIdx].dataset.slide); return;
+    if (e.key === 'Enter') {
+      const q = document.getElementById('search-input').value.trim().toLowerCase();
+      if (q === 'treasure' && _treasureStep === 3) {
+        closeSearch(); showTreasure(); return;
+      }
+      if (els[selIdx]) { jumpTo(els[selIdx].dataset.group, +els[selIdx].dataset.slide); return; }
     }
     return; // block all other keys while search is open
   }
@@ -1439,8 +1502,17 @@ let mapProjection  = null;
 let highlightCountry = null;
 
 function showMapHighlight(nameJa) {
+  if (nameJa === 'ハイチ' && _treasureStep === 2) _treasureStep = 3;
   highlightCountry = nameJa;
   showMap();
+}
+
+function showTreasure() {
+  document.getElementById('treasure-overlay').classList.remove('hidden');
+}
+function hideTreasure() {
+  document.getElementById('treasure-overlay').classList.add('hidden');
+  _treasureStep = 0;
 }
 
 async function initMap() {
@@ -1505,6 +1577,7 @@ function renderMap() {
         </div>`;
       el.addEventListener('click', e => {
         e.stopPropagation();
+        if (country.nameJa === 'ハイチ' && _treasureStep === 1) _treasureStep = 2;
         highlightCountry = null;
         hideMap();
         showGroup(groupKey);
@@ -1515,7 +1588,7 @@ function renderMap() {
   });
 }
 
-document.getElementById('map-btn').addEventListener('click', () => { highlightCountry = null; showMap(); });
+document.getElementById('map-btn').addEventListener('click', () => { _treasureStep = 1; highlightCountry = null; showMap(); });
 document.getElementById('rand-btn').addEventListener('click', () => {
   const keys = Object.keys(DATA);
   const key = keys[Math.floor(Math.random() * keys.length)];
@@ -1599,6 +1672,7 @@ function updateSelection() {
   if (els[selIdx]) els[selIdx].scrollIntoView({ block: 'nearest' });
 }
 
+document.getElementById('trs-close').addEventListener('click', hideTreasure);
 document.getElementById('search-btn').addEventListener('click', openSearch);
 document.getElementById('search-close').addEventListener('click', closeSearch);
 document.getElementById('search-input').addEventListener('input', e => {

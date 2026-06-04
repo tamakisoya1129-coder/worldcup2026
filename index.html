@@ -2014,7 +2014,7 @@ function openVoyageGame() {
   VOY.ctx    = VOY.canvas.getContext('2d');
   const W = VOY.canvas.width, H = VOY.canvas.height;
   VOY.score = 0; VOY.lives = 3; VOY.timeLeft = 90;
-  VOY.player = { x: 120, y: H/2, vx: 0, vy: 0, size: 24, inv: 0 };
+  VOY.player = { x: 120, y: H/2, vx: 0, vy: 0, size: 24, inv: 0, angle: 0 };
   VOY.treasures = []; VOY.rocks = []; VOY.storms = [];
   VOY.keys = {}; VOY.running = true;
   for (let i = 0; i < 14; i++)
@@ -2122,13 +2122,23 @@ function _voyLoop() {
     ctx.beginPath(); ctx.arc(t.x, t.y, 24+Math.sin(t.pulse)*4, 0, Math.PI*2); ctx.stroke();
   });
 
+  if (Math.hypot(p.vx, p.vy) > 0.3) p.angle = Math.atan2(p.vy, p.vx) + Math.PI/2;
   ctx.save();
-  ctx.globalAlpha = p.inv > 0 ? (Math.floor(p.inv/6)%2 === 0 ? 0.2 : 1) : 1;
-  ctx.font = '34px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  if (Math.hypot(p.vx, p.vy) > 0.4) {
-    ctx.translate(p.x, p.y); ctx.rotate(Math.atan2(p.vy, p.vx) - Math.PI/2);
-    ctx.fillText('⛵', 0, 0);
-  } else ctx.fillText('⛵', p.x, p.y);
+  ctx.globalAlpha = p.inv > 0 ? (Math.floor(p.inv/6)%2 === 0 ? 0.15 : 1) : 1;
+  ctx.translate(p.x, p.y); ctx.rotate(p.angle);
+  // Hull
+  ctx.fillStyle = '#7a4828'; ctx.strokeStyle = '#3a1e08'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0,-22); ctx.lineTo(16,6); ctx.lineTo(13,18); ctx.lineTo(-13,18); ctx.lineTo(-16,6); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  // Mast
+  ctx.fillStyle = '#3a2010'; ctx.fillRect(-2,-32,4,36);
+  // Sail
+  ctx.fillStyle = '#e8e0cc'; ctx.strokeStyle = '#b0a880'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0,-32); ctx.lineTo(20,-8); ctx.lineTo(0,-6); ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  // Jolly Roger flag
+  ctx.fillStyle = '#111';
+  ctx.beginPath(); ctx.moveTo(0,-32); ctx.lineTo(11,-24); ctx.lineTo(0,-18); ctx.closePath(); ctx.fill();
   ctx.restore();
 
   ctx.font = 'bold 15px -apple-system,sans-serif'; ctx.textBaseline = 'top';

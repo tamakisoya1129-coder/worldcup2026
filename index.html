@@ -19,12 +19,57 @@
     position: relative; overflow: hidden;
   }
 
+  /* ── SHARED: hidden ── */
+  .screen.hidden,
+  #pk-overlay.hidden, #treasure-overlay.hidden, #dice-overlay.hidden, #voyage-overlay.hidden,
+  .schedule-panel.hidden, .pk-final.hidden, .voy-result.hidden { display: none; }
+
+  /* ── SHARED: ghost button (11px bordered, cyan hover) ── */
+  .back-btn, .map-back, .map-jump-btn, .pk-hdr-back, .voy-back {
+    font-size: 11px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em;
+    padding: 4px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
+    cursor: pointer; transition: color 0.15s, border-color 0.15s;
+  }
+  .back-btn:hover, .map-back:hover, .map-jump-btn:hover, .pk-hdr-back:hover, .voy-back:hover {
+    color: #00d4ff; border-color: rgba(0,212,255,0.6);
+  }
+
+  /* ── SHARED: overlay header bar ── */
+  .map-header, .pk-hdr, .voy-hdr {
+    display: flex; align-items: center; gap: 20px; flex-shrink: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .map-header, .pk-hdr { padding: 14px 28px; }
+  .voy-hdr { padding: 10px 24px; background: rgba(0,0,0,0.5); }
+
+  /* ── SHARED: overlay header title ── */
+  .map-header-title, .pk-hdr-title, .voy-title {
+    font-size: 13px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em;
+  }
+
+  /* ── SHARED: result/final screen ── */
+  .pk-final, .voy-result {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px;
+  }
+  .pk-final  { z-index: 10; background: rgba(8,16,26,0.97); }
+  .voy-result { z-index: 5;  background: rgba(4,14,26,0.96); }
+
+  /* ── SHARED: cyan action button ── */
+  .pk-btn-primary, .voy-btn-cyan {
+    padding: 10px 28px; border-radius: 6px; cursor: pointer;
+    font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
+    background: rgba(0,212,255,0.14); border: 1.5px solid rgba(0,212,255,0.5); color: #00d4ff;
+    transition: background 0.15s;
+  }
+  .pk-btn-primary:hover, .voy-btn-cyan:hover { background: rgba(0,212,255,0.25); }
+
   /* ── SCREENS ── */
   .screen {
     position: absolute; inset: 0;
     background: linear-gradient(135deg, #0f1923 0%, #1a2a3a 100%);
   }
-  .screen.hidden { display: none; }
 
   /* ══════════════════════════════
      HOME SCREEN
@@ -109,12 +154,6 @@
     display: flex; justify-content: space-between; align-items: center;
   }
   .top-left { display: flex; align-items: center; gap: 16px; }
-  .back-btn {
-    font-size: 11px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em;
-    padding: 4px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
-    cursor: pointer; transition: color 0.15s, border-color 0.15s;
-  }
-  .back-btn:hover { color: #00d4ff; border-color: rgba(0,212,255,0.6); }
   .top-label { font-size: 12px; font-weight: 700; color: #8899aa; letter-spacing: 0.14em; }
   .page-num  { font-size: 12px; color: #8899aa; letter-spacing: 0.08em; }
 
@@ -231,21 +270,6 @@
   .map-btn:hover { background: rgba(0,212,255,0.1); border-color: rgba(0,212,255,0.5); color: #00d4ff; }
 
   #map-screen { z-index: 2; display: flex; flex-direction: column; }
-  #map-screen.hidden { display: none; }
-  .map-header {
-    display: flex; align-items: center; gap: 20px;
-    padding: 14px 28px; flex-shrink: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
-  .map-back {
-    font-size: 11px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em;
-    padding: 4px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
-    cursor: pointer; transition: color 0.15s, border-color 0.15s;
-  }
-  .map-back:hover { color: #00d4ff; border-color: rgba(0,212,255,0.6); }
-  .map-header-title {
-    font-size: 13px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em;
-  }
   .map-body {
     position: relative; flex: 1; overflow: hidden;
   }
@@ -273,12 +297,6 @@
     0%   { transform: translate(-50%,-50%) scale(0.6); opacity: 1; }
     100% { transform: translate(-50%,-50%) scale(2.2); opacity: 0; }
   }
-  .map-jump-btn {
-    font-size: 11px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em;
-    padding: 4px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
-    cursor: pointer; transition: color 0.15s, border-color 0.15s;
-  }
-  .map-jump-btn:hover { color: #00d4ff; border-color: rgba(0,212,255,0.6); }
   .marker-tip {
     display: none; position: absolute; bottom: calc(100% + 4px); left: 50%;
     transform: translateX(-50%); white-space: nowrap;
@@ -342,7 +360,6 @@
     display: flex; align-items: center; justify-content: center;
     animation: dice-bg 1.5s ease forwards;
   }
-  #dice-overlay.hidden { display: none; }
   @keyframes dice-bg {
     0%   { background: rgba(8,16,26,0); }
     15%  { background: rgba(8,16,26,0.93); }
@@ -393,19 +410,6 @@
     display: flex; flex-direction: column;
     background: linear-gradient(180deg, #0a1c35 0%, #0d2818 55%, #0a2018 100%);
   }
-  #pk-overlay.hidden { display: none; }
-  .pk-hdr {
-    display: flex; align-items: center; gap: 20px;
-    padding: 14px 28px; flex-shrink: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
-  .pk-hdr-back {
-    font-size: 11px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em;
-    padding: 4px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
-    cursor: pointer; transition: color 0.15s, border-color 0.15s;
-  }
-  .pk-hdr-back:hover { color: #00d4ff; border-color: rgba(0,212,255,0.6); }
-  .pk-hdr-title { font-size: 13px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em; }
   .pk-hdr-dots { margin-left: auto; display: flex; gap: 8px; align-items: center; }
   .pk-hdot {
     width: 26px; height: 26px; border-radius: 50%;
@@ -480,23 +484,10 @@
     font-size: 14px; color: #8899aa; letter-spacing: 0.08em;
     height: 22px; text-align: center;
   }
-  .pk-final {
-    position: absolute; inset: 0; z-index: 10;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: rgba(8,16,26,0.97); gap: 16px;
-  }
-  .pk-final.hidden { display: none; }
   .pk-final-score { font-size: 80px; font-weight: 900; color: #00d4ff; text-shadow: 0 0 50px rgba(0,212,255,0.6); }
   .pk-final-msg { font-size: 22px; font-weight: 700; color: #fff; }
   .pk-final-sub { font-size: 13px; color: #8899aa; }
   .pk-final-btns { display: flex; gap: 14px; margin-top: 16px; }
-  .pk-btn-primary {
-    padding: 10px 28px; border-radius: 6px; cursor: pointer;
-    font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
-    background: rgba(0,212,255,0.14); border: 1.5px solid rgba(0,212,255,0.5); color: #00d4ff;
-    transition: background 0.15s;
-  }
-  .pk-btn-primary:hover { background: rgba(0,212,255,0.25); }
   .pk-btn-secondary {
     padding: 10px 28px; border-radius: 6px; cursor: pointer;
     font-size: 13px; font-weight: 700; letter-spacing: 0.08em;
@@ -512,7 +503,6 @@
     background: radial-gradient(ellipse at 50% 38%, #1e0e00 0%, #050200 65%, #000 100%);
     gap: 10px;
   }
-  #treasure-overlay.hidden { display: none; }
   #treasure-overlay::before {
     content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 90px;
     background: linear-gradient(0deg, rgba(0,20,50,0.7), transparent);
@@ -600,39 +590,12 @@
     position: absolute; inset: 0; z-index: 45;
     display: flex; flex-direction: column; background: #05111f;
   }
-  #voyage-overlay.hidden { display: none; }
-  .voy-hdr {
-    display: flex; align-items: center; gap: 20px;
-    padding: 10px 24px; flex-shrink: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    background: rgba(0,0,0,0.5);
-  }
-  .voy-back {
-    font-size: 11px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em;
-    padding: 4px 10px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px;
-    cursor: pointer; transition: color 0.15s, border-color 0.15s;
-  }
-  .voy-back:hover { color: #00d4ff; border-color: rgba(0,212,255,0.6); }
-  .voy-title { font-size: 13px; font-weight: 700; color: #8899aa; letter-spacing: 0.1em; }
   .voy-hint { margin-left: auto; font-size: 11px; color: rgba(136,153,170,0.55); letter-spacing: 0.06em; }
   #voyage-canvas { display: block; flex: 1; }
-  .voy-result {
-    position: absolute; inset: 0; z-index: 5;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: rgba(4,14,26,0.96); gap: 16px;
-  }
-  .voy-result.hidden { display: none; }
   .voy-result-title { font-size: 26px; font-weight: 900; color: #f0c040; }
   .voy-result-score { font-size: 72px; font-weight: 900; color: #00d4ff; text-shadow: 0 0 40px rgba(0,212,255,0.6); }
   .voy-result-msg { font-size: 18px; color: #fff; font-weight: 700; }
   .voy-result-btns { display: flex; gap: 14px; margin-top: 10px; }
-  .voy-btn-cyan {
-    padding: 10px 28px; border-radius: 6px; cursor: pointer; font-size: 13px;
-    font-weight: 700; letter-spacing: 0.08em;
-    background: rgba(0,212,255,0.14); border: 1.5px solid rgba(0,212,255,0.5); color: #00d4ff;
-    transition: background 0.15s;
-  }
-  .voy-btn-cyan:hover { background: rgba(0,212,255,0.25); }
   .voy-btn-gold {
     padding: 10px 28px; border-radius: 6px; cursor: pointer; font-size: 13px;
     font-weight: 700; letter-spacing: 0.08em;

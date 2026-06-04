@@ -535,13 +535,16 @@
     85%  { opacity: 0.9; }
     100% { transform: rotate(600deg) translateX(30px); opacity: 0; top: 108%; }
   }
-  .trs-ship {
-    position: absolute; bottom: 18px; font-size: 44px; z-index: 2;
-    animation: trs-sail 11s linear infinite;
-    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.9));
-    pointer-events: none;
+  .trs-bg-ship {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    z-index: 0; pointer-events: none;
+    animation: trs-rock 8s ease-in-out infinite;
+    transform-origin: 50% 82%;
   }
-  @keyframes trs-sail { 0% { left: 108%; } 100% { left: -14%; } }
+  @keyframes trs-rock {
+    0%, 100% { transform: rotate(-0.7deg) translateY(0); }
+    50%       { transform: rotate(0.7deg)  translateY(-5px); }
+  }
   .trs-content {
     position: relative; z-index: 3;
     display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -666,7 +669,76 @@
   <!-- ══ TREASURE EASTER EGG ══ -->
   <div id="treasure-overlay" class="hidden">
     <span class="trs-close" id="trs-close">ESC / 閉じる</span>
-    <div class="trs-ship">⛵</div>
+    <svg class="trs-bg-ship" viewBox="0 0 1000 560" preserveAspectRatio="xMidYEnd meet" xmlns="http://www.w3.org/2000/svg">
+      <!-- Masts (behind sails) -->
+      <line x1="255" y1="35" x2="255" y2="330" stroke="#2e1a08" stroke-width="9"/>
+      <line x1="480" y1="8"  x2="480" y2="330" stroke="#2e1a08" stroke-width="13"/>
+      <line x1="720" y1="72" x2="720" y2="330" stroke="#2e1a08" stroke-width="9"/>
+      <!-- Bowsprit -->
+      <line x1="78" y1="290" x2="-30" y2="185" stroke="#2e1a08" stroke-width="7"/>
+      <!-- Yards (horizontal spars) -->
+      <line x1="142" y1="88"  x2="368" y2="88"  stroke="#241506" stroke-width="6"/>
+      <line x1="158" y1="162" x2="352" y2="162" stroke="#241506" stroke-width="4"/>
+      <line x1="328" y1="62"  x2="632" y2="62"  stroke="#241506" stroke-width="8"/>
+      <line x1="344" y1="148" x2="616" y2="148" stroke="#241506" stroke-width="6"/>
+      <line x1="360" y1="232" x2="600" y2="232" stroke="#241506" stroke-width="5"/>
+      <line x1="638" y1="118" x2="802" y2="118" stroke="#241506" stroke-width="5"/>
+      <line x1="652" y1="192" x2="788" y2="192" stroke="#241506" stroke-width="4"/>
+      <!-- Rigging -->
+      <line x1="255" y1="35"  x2="480" y2="62"  stroke="#201005" stroke-width="1.5" opacity="0.9"/>
+      <line x1="480" y1="8"   x2="720" y2="118" stroke="#201005" stroke-width="1.5" opacity="0.9"/>
+      <line x1="78"  y1="290" x2="255" y2="88"  stroke="#201005" stroke-width="1.2" opacity="0.7"/>
+      <line x1="255" y1="88"  x2="480" y2="148" stroke="#201005" stroke-width="1"   opacity="0.6"/>
+      <line x1="480" y1="62"  x2="720" y2="118" stroke="#201005" stroke-width="1"   opacity="0.6"/>
+      <line x1="255" y1="35"  x2="78"  y2="330" stroke="#201005" stroke-width="1"   opacity="0.5"/>
+      <!-- Fore sails -->
+      <path d="M148,88 Q253,112 366,88 L348,162 Q253,140 162,162 Z"   fill="#201806"/>
+      <path d="M161,162 Q253,186 350,162 L330,258 Q253,236 178,258 Z"  fill="#1c1505"/>
+      <path d="M196,40 Q255,53 314,40  L302,88  Q255,78 208,88 Z"      fill="#201806"/>
+      <!-- Main sails -->
+      <path d="M332,62  Q480,94  628,62  L610,148 Q480,122 350,148 Z"  fill="#201806"/>
+      <path d="M347,148 Q480,178 613,148 L594,232 Q480,206 365,232 Z"  fill="#1c1505"/>
+      <path d="M363,232 Q480,260 597,232 L578,322 Q480,298 382,322 Z"  fill="#181204"/>
+      <path d="M408,15  Q480,29  552,15  L538,62  Q480,50 442,62 Z"    fill="#201806"/>
+      <!-- Skull on main sail -->
+      <text x="480" y="205" font-size="58" text-anchor="middle" fill="#0e0c04" opacity="0.95">☠</text>
+      <!-- Crow's nest -->
+      <rect x="458" y="52" width="44" height="14" fill="#1e1206" rx="3"/>
+      <rect x="464" y="40" width="32" height="14" fill="#1a1005" rx="2"/>
+      <!-- Jolly Roger flag -->
+      <path d="M480,8 L560,24 L480,42 Z" fill="#111"/>
+      <text x="526" y="34" font-size="16" text-anchor="middle" fill="#222">☠</text>
+      <!-- Mizzen sails -->
+      <path d="M641,118 Q720,142 800,118 L786,192 Q720,170 655,192 Z"  fill="#201806"/>
+      <path d="M655,192 Q720,214 787,192 L772,272 Q720,252 668,272 Z"  fill="#1c1505"/>
+      <!-- Hull -->
+      <path d="M78,330 L922,330 L945,360 L955,395 Q900,428 480,448 Q60,428 45,395 L50,360 Z"
+            fill="#150b03" stroke="#3e2008" stroke-width="2.5"/>
+      <!-- Deck rail -->
+      <rect x="76" y="322" width="848" height="12" fill="#1e1005" stroke="#3e2008" stroke-width="2" rx="2"/>
+      <!-- Forecastle -->
+      <path d="M78,322 L248,322 L248,278 Q160,278 78,278 Z" fill="#180c04"/>
+      <rect x="76" y="272" width="174" height="10" fill="#201005" stroke="#3e2008" stroke-width="1.5" rx="1"/>
+      <!-- Quarterdeck -->
+      <path d="M762,322 L922,322 L945,360 L945,268 L762,268 Z" fill="#180c04"/>
+      <rect x="760" y="262" width="188" height="10" fill="#201005" stroke="#3e2008" stroke-width="1.5" rx="1"/>
+      <!-- Stern windows -->
+      <rect x="825" y="278" width="34" height="26" fill="#06121e" stroke="#5a3810" stroke-width="2" rx="3"/>
+      <rect x="872" y="278" width="34" height="26" fill="#06121e" stroke="#5a3810" stroke-width="2" rx="3"/>
+      <rect x="827" y="280" width="30" height="22" fill="#081828" rx="2" opacity="0.7"/>
+      <rect x="874" y="280" width="30" height="22" fill="#081828" rx="2" opacity="0.7"/>
+      <!-- Gunports -->
+      <rect x="168" y="344" width="30" height="17" fill="#0a0603" rx="2"/>
+      <rect x="260" y="344" width="30" height="17" fill="#0a0603" rx="2"/>
+      <rect x="352" y="344" width="30" height="17" fill="#0a0603" rx="2"/>
+      <rect x="444" y="344" width="30" height="17" fill="#0a0603" rx="2"/>
+      <rect x="536" y="344" width="30" height="17" fill="#0a0603" rx="2"/>
+      <rect x="628" y="344" width="30" height="17" fill="#0a0603" rx="2"/>
+      <rect x="714" y="344" width="30" height="17" fill="#0a0603" rx="2"/>
+      <!-- Water -->
+      <path d="M-10,456 Q110,434 230,456 Q350,478 470,456 Q590,434 710,456 Q830,478 950,456 L1010,456 L1010,560 L-10,560 Z" fill="#04101e"/>
+      <path d="M-10,478 Q130,460 270,478 Q410,496 530,478 Q650,460 780,478 Q900,496 1010,478 L1010,560 L-10,560 Z" fill="#030c18" opacity="0.8"/>
+    </svg>
     <div class="trs-content">
       <div class="trs-skulls">🏴‍☠️🏴‍☠️</div>
       <div class="trs-chest">💰</div>

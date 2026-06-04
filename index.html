@@ -507,42 +507,81 @@
 
   /* ── TREASURE EASTER EGG ── */
   #treasure-overlay {
-    position: absolute; inset: 0; z-index: 60;
+    position: absolute; inset: 0; z-index: 60; overflow: hidden;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: radial-gradient(ellipse at 50% 55%, #2a1500 0%, #080600 100%);
-    gap: 16px;
+    background: radial-gradient(ellipse at 50% 38%, #1e0e00 0%, #050200 65%, #000 100%);
+    gap: 10px;
   }
   #treasure-overlay.hidden { display: none; }
+  #treasure-overlay::before {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 90px;
+    background: linear-gradient(0deg, rgba(0,20,50,0.7), transparent);
+    pointer-events: none; z-index: 0;
+  }
   .trs-close {
-    position: absolute; top: 20px; right: 28px;
+    position: absolute; top: 20px; right: 28px; z-index: 10;
     font-size: 11px; font-weight: 700; color: #8a7040; cursor: pointer;
     padding: 4px 12px; border: 1px solid rgba(200,160,60,0.3); border-radius: 4px;
     letter-spacing: 0.08em; transition: color 0.15s, border-color 0.15s;
   }
   .trs-close:hover { color: #f0c040; border-color: rgba(240,192,64,0.6); }
-  .trs-chest { font-size: 96px; animation: trs-bob 2s ease-in-out infinite; }
-  @keyframes trs-bob {
-    0%, 100% { transform: translateY(0) rotate(-3deg); }
-    50%       { transform: translateY(-14px) rotate(3deg); }
+  .trs-drop {
+    position: absolute; top: -60px; font-size: 22px; z-index: 1;
+    animation: trs-fall linear infinite; pointer-events: none; user-select: none;
   }
+  @keyframes trs-fall {
+    0%   { transform: rotate(0deg)   translateX(0);    opacity: 0; }
+    8%   { opacity: 1; }
+    85%  { opacity: 0.9; }
+    100% { transform: rotate(600deg) translateX(30px); opacity: 0; top: 108%; }
+  }
+  .trs-ship {
+    position: absolute; bottom: 18px; font-size: 44px; z-index: 2;
+    animation: trs-sail 11s linear infinite;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.9));
+    pointer-events: none;
+  }
+  @keyframes trs-sail { 0% { left: 108%; } 100% { left: -14%; } }
+  .trs-content {
+    position: relative; z-index: 3;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .trs-skulls {
+    font-size: 30px; letter-spacing: 36px; opacity: 0.75;
+    animation: trs-sway 3.5s ease-in-out infinite alternate;
+  }
+  @keyframes trs-sway { 0% { transform: rotate(-6deg); } 100% { transform: rotate(6deg); } }
+  .trs-chest {
+    font-size: 108px; line-height: 1;
+    animation: trs-glow 1.6s ease-in-out infinite alternate;
+  }
+  @keyframes trs-glow {
+    0%   { transform: scale(1)    rotate(-3deg); filter: drop-shadow(0 0 18px rgba(240,192,64,0.5)); }
+    100% { transform: scale(1.07) rotate(3deg);  filter: drop-shadow(0 0 55px rgba(255,210,0,1));   }
+  }
+  .trs-sparkles {
+    font-size: 20px; letter-spacing: 14px;
+    animation: trs-twinkle 1s ease-in-out infinite alternate;
+  }
+  @keyframes trs-twinkle { 0% { opacity: 0.3; } 100% { opacity: 1; } }
   .trs-title {
-    font-size: 34px; font-weight: 900; letter-spacing: 0.06em;
-    color: #f0c040; text-shadow: 0 0 30px rgba(240,192,64,0.9), 0 0 80px rgba(240,160,0,0.4);
+    font-size: 33px; font-weight: 900; letter-spacing: 0.05em; margin-top: 4px;
+    color: #f0c040; text-shadow: 0 0 28px rgba(240,192,64,0.9), 0 0 80px rgba(255,180,0,0.5);
   }
-  .trs-sub { font-size: 13px; color: #b08830; letter-spacing: 0.1em; }
+  .trs-sub { font-size: 12px; color: #a07828; letter-spacing: 0.12em; }
   .trs-card {
-    max-width: 520px; background: rgba(240,192,64,0.06);
-    border: 1px solid rgba(240,192,64,0.18); border-radius: 10px;
-    padding: 20px 28px; font-size: 15px; color: #d4a838; line-height: 1.85; text-align: center;
+    max-width: 500px; background: rgba(240,192,64,0.06);
+    border: 1px solid rgba(240,192,64,0.22); border-radius: 10px;
+    padding: 16px 26px; font-size: 14px; color: #d4a838; line-height: 1.85; text-align: center;
   }
   .trs-card b { color: #f0c040; }
-  .trs-coins {
-    font-size: 26px; letter-spacing: 10px;
-    animation: trs-coins 2.4s ease-in-out infinite;
+  .trs-loot {
+    font-size: 24px; letter-spacing: 10px;
+    animation: trs-loot 2.2s ease-in-out infinite;
   }
-  @keyframes trs-coins {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; filter: drop-shadow(0 0 10px rgba(240,192,64,0.9)); }
+  @keyframes trs-loot {
+    0%, 100% { filter: none; opacity: 0.75; }
+    50% { filter: drop-shadow(0 0 14px rgba(240,192,64,1)); opacity: 1; }
   }
 </style>
 </head>
@@ -627,15 +666,20 @@
   <!-- ══ TREASURE EASTER EGG ══ -->
   <div id="treasure-overlay" class="hidden">
     <span class="trs-close" id="trs-close">ESC / 閉じる</span>
-    <div class="trs-chest">🪙</div>
-    <div class="trs-title">海賊の財宝を発見！</div>
-    <div class="trs-sub">🏴‍☠️ &nbsp; You found the hidden treasure &nbsp; 🏴‍☠️</div>
-    <div class="trs-card">
-      18世紀、ハイチ沖の<b>トルトゥーガ島</b>は実在した海賊共和国。<br>
-      ブラックベアード、カリブの海賊たちがここを根城に大西洋を支配した。<br><br>
-      ハイチはW杯の財宝だけでなく、<b>本物の埋蔵金伝説</b>も持つ国だ。
+    <div class="trs-ship">⛵</div>
+    <div class="trs-content">
+      <div class="trs-skulls">🏴‍☠️🏴‍☠️</div>
+      <div class="trs-chest">💰</div>
+      <div class="trs-sparkles">✨✨✨✨✨</div>
+      <div class="trs-title">海賊の財宝を発見！</div>
+      <div class="trs-sub">🏴‍☠️ &nbsp; You found the hidden treasure &nbsp; 🏴‍☠️</div>
+      <div class="trs-card">
+        18世紀、ハイチ沖の<b>トルトゥーガ島</b>は実在した海賊共和国。<br>
+        ブラックベアード、カリブの海賊たちがここを根城に大西洋を支配した。<br><br>
+        ハイチはW杯の財宝だけでなく、<b>本物の埋蔵金伝説</b>も持つ国だ。
+      </div>
+      <div class="trs-loot">⚓ 🪙 💎 🗺️ ⚔️ 💎 🪙 ⚓</div>
     </div>
-    <div class="trs-coins">🪙 🪙 🪙 🪙 🪙</div>
   </div>
 
   <!-- ══ DICE OVERLAY ══ -->
@@ -1508,7 +1552,20 @@ function showMapHighlight(nameJa) {
 }
 
 function showTreasure() {
-  document.getElementById('treasure-overlay').classList.remove('hidden');
+  const overlay = document.getElementById('treasure-overlay');
+  overlay.classList.remove('hidden');
+  if (overlay.querySelector('.trs-drop')) return;
+  const items = ['🪙','🪙','🪙','💎','🪙','💰','🪙','🪙','💎','🪙','🪙','💰','💎','🪙','🪙','🪙','💎','🪙'];
+  items.forEach((icon, i) => {
+    const el = document.createElement('span');
+    el.className = 'trs-drop';
+    el.textContent = icon;
+    el.style.left            = (4 + (i / items.length) * 92) + '%';
+    el.style.animationDuration = (2.8 + Math.random() * 2.4) + 's';
+    el.style.animationDelay    = (Math.random() * 2.8) + 's';
+    el.style.fontSize          = (16 + Math.random() * 12) + 'px';
+    overlay.appendChild(el);
+  });
 }
 function hideTreasure() {
   document.getElementById('treasure-overlay').classList.add('hidden');

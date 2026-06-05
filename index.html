@@ -341,10 +341,28 @@ a { color: inherit; text-decoration: none; }
 }
 .trs-map-btn { cursor: pointer; display: inline-block; transition: transform 0.15s, filter 0.15s; letter-spacing: 0; }
 .trs-map-btn:hover { transform: scale(1.6); filter: drop-shadow(0 0 12px rgba(100,200,255,1)); }
-/* サイコロアニメーション */
-.dice-overlay { position: fixed; inset: 0; z-index: 350; pointer-events: none; display: flex; align-items: center; justify-content: center; background: rgba(8,16,26,0.75); }
+/* サイコロアニメーション（3D） */
+.dice-overlay { position: fixed; inset: 0; z-index: 350; pointer-events: none; display: flex; align-items: center; justify-content: center; animation: dice-bg 1.5s ease forwards; }
 .dice-overlay.hidden { display: none; }
-.dice-face { font-size: 130px; line-height: 1; filter: drop-shadow(0 0 32px rgba(0,212,255,0.85)); }
+@keyframes dice-bg { 0% { background: rgba(8,16,26,0); } 15% { background: rgba(8,16,26,0.93); } 75% { background: rgba(8,16,26,0.93); } 100% { background: rgba(8,16,26,0); } }
+.dice-scene { perspective: 900px; width: 200px; height: 200px; }
+.dice-cube { width: 200px; height: 200px; position: relative; transform-style: preserve-3d; animation: dice-spin 1.5s cubic-bezier(0.18, 0.6, 0.35, 1) forwards; }
+@keyframes dice-spin {
+  0%   { transform: rotateX(0deg)   rotateY(0deg)   rotateZ(0deg)   scale3d(0.08,0.08,0.08); }
+  18%  { transform: rotateX(210deg) rotateY(135deg) rotateZ(60deg)  scale3d(1.12,1.12,1.12); }
+  38%  { transform: rotateX(390deg) rotateY(265deg) rotateZ(130deg) scale3d(0.96,0.96,0.96); }
+  60%  { transform: rotateX(560deg) rotateY(385deg) rotateZ(210deg) scale3d(1.01,1.01,1.01); }
+  82%  { transform: rotateX(670deg) rotateY(495deg) rotateZ(310deg) scale3d(1.0,1.0,1.0); }
+  100% { transform: rotateX(720deg) rotateY(540deg) rotateZ(360deg) scale3d(1.0,1.0,1.0); }
+}
+.dice-face { position: absolute; width: 200px; height: 200px; background: linear-gradient(145deg, #1a3a58, #0d1f30); border: 1.5px solid rgba(0,212,255,0.4); border-radius: 22px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 22px; box-shadow: inset 0 0 30px rgba(0,0,0,0.5), 0 0 28px rgba(0,212,255,0.18); }
+.dice-face .dot { width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #7df5ff, #00d4ff); box-shadow: 0 0 14px rgba(0,212,255,0.9); align-self: center; justify-self: center; }
+.dice-front  { transform: translateZ(100px); }
+.dice-back   { transform: rotateY(180deg)  translateZ(100px); }
+.dice-right  { transform: rotateY(90deg)   translateZ(100px); }
+.dice-left   { transform: rotateY(-90deg)  translateZ(100px); }
+.dice-top    { transform: rotateX(90deg)   translateZ(100px); }
+.dice-bottom { transform: rotateX(-90deg)  translateZ(100px); }
 /* 国モーダル ヘッダー行（名前 + ミニ地球儀） */
 .modal-header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
 .modal-header-row > div:first-child { flex: 1; min-width: 0; }
@@ -378,9 +396,6 @@ a { color: inherit; text-decoration: none; }
   <div class="container">
     <div class="header-inner">
       <span class="site-logo">⚽ W杯2026 豆知識図鑑</span>
-      <div class="header-right">
-        <button class="btn-ghost" id="rand-btn">🎲 ランダム</button>
-      </div>
     </div>
   </div>
 </header>
@@ -465,9 +480,38 @@ a { color: inherit; text-decoration: none; }
   </div>
 </footer>
 
-<!-- サイコロアニメーションオーバーレイ -->
+<!-- サイコロアニメーションオーバーレイ（3D） -->
 <div class="dice-overlay hidden" id="dice-overlay">
-  <div class="dice-face" id="dice-face">🎲</div>
+  <div class="dice-scene">
+    <div class="dice-cube">
+      <div class="dice-face dice-front">
+        <span class="dot" style="grid-row:2;grid-column:2"></span>
+      </div>
+      <div class="dice-face dice-back">
+        <span class="dot" style="grid-row:1;grid-column:1"></span><span class="dot" style="grid-row:1;grid-column:3"></span>
+        <span class="dot" style="grid-row:2;grid-column:1"></span><span class="dot" style="grid-row:2;grid-column:3"></span>
+        <span class="dot" style="grid-row:3;grid-column:1"></span><span class="dot" style="grid-row:3;grid-column:3"></span>
+      </div>
+      <div class="dice-face dice-right">
+        <span class="dot" style="grid-row:1;grid-column:3"></span>
+        <span class="dot" style="grid-row:2;grid-column:2"></span>
+        <span class="dot" style="grid-row:3;grid-column:1"></span>
+      </div>
+      <div class="dice-face dice-left">
+        <span class="dot" style="grid-row:1;grid-column:1"></span><span class="dot" style="grid-row:1;grid-column:3"></span>
+        <span class="dot" style="grid-row:3;grid-column:1"></span><span class="dot" style="grid-row:3;grid-column:3"></span>
+      </div>
+      <div class="dice-face dice-top">
+        <span class="dot" style="grid-row:1;grid-column:1"></span><span class="dot" style="grid-row:1;grid-column:3"></span>
+        <span class="dot" style="grid-row:2;grid-column:2"></span>
+        <span class="dot" style="grid-row:3;grid-column:1"></span><span class="dot" style="grid-row:3;grid-column:3"></span>
+      </div>
+      <div class="dice-face dice-bottom">
+        <span class="dot" style="grid-row:1;grid-column:3"></span>
+        <span class="dot" style="grid-row:3;grid-column:1"></span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- PKゲームオーバーレイ -->
@@ -1324,22 +1368,9 @@ document.getElementById('search-overlay').addEventListener('click', closeSearch)
    ランダム
 ───────────────────────────────────────── */
 function showDice(cb) {
-  const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
   const overlay = document.getElementById('dice-overlay');
-  const face = document.getElementById('dice-face');
   overlay.classList.remove('hidden');
-  let i = 0, delay = 45;
-  function tick() {
-    face.textContent = faces[i++ % 6];
-    delay = delay * 1.14;
-    if (delay < 260) {
-      setTimeout(tick, Math.round(delay));
-    } else {
-      face.textContent = faces[Math.floor(Math.random() * 6)];
-      setTimeout(() => { overlay.classList.add('hidden'); face.textContent = '🎲'; cb(); }, 500);
-    }
-  }
-  tick();
+  setTimeout(() => { overlay.classList.add('hidden'); cb(); }, 1600);
 }
 
 let _randBusy = false;
@@ -1358,7 +1389,6 @@ function goRandom() {
     setTimeout(() => openModal(key, idx), 300);
   });
 }
-document.getElementById('rand-btn').addEventListener('click', goRandom);
 document.getElementById('hero-rand-btn').addEventListener('click', goRandom);
 
 /* ─────────────────────────────────────────

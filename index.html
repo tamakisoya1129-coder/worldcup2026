@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<title>Stats Card</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -9,79 +10,78 @@
     background: linear-gradient(135deg, #0f1923 0%, #1a2a3a 100%);
     font-family: -apple-system, 'Hiragino Sans', 'Yu Gothic', sans-serif;
     color: #fff; display: flex; flex-direction: column;
-    justify-content: center; align-items: center; gap: 28px;
+    justify-content: center; align-items: center; gap: 24px;
   }
-  .header {
-    font-size: 15px; color: #8899aa; letter-spacing: 0.12em; text-transform: uppercase;
-  }
+  .header { font-size: 15px; color: #8899aa; letter-spacing: 0.08em; }
   .teams {
-    display: flex; align-items: center; gap: 48px;
+    display: flex; align-items: center; gap: 44px; font-size: 32px; font-weight: 700;
   }
-  .team {
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-  }
-  .team-flag { font-size: 52px; }
-  .team-name { font-size: 22px; font-weight: 700; letter-spacing: 0.05em; }
-  .team-year { font-size: 13px; color: #8899aa; }
-  .vs { color: #00d4ff; font-size: 32px; font-weight: 700; }
+  .team-block { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .team-label { font-size: 13px; color: #8899aa; font-weight: 400; }
+  .divider { font-size: 28px; color: #00d4ff; font-weight: 900; }
   .stats { width: 860px; }
   .stat-row {
-    display: grid; grid-template-columns: 1fr 180px 1fr;
+    display: grid; grid-template-columns: 1fr auto 1fr;
     align-items: center; gap: 16px;
-    padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
   }
   .stat-row:last-child { border-bottom: none; }
-  .val { font-size: 26px; font-weight: 700; }
-  .val.left { text-align: right; color: #fff; }
-  .val.right { text-align: left; color: #aabbcc; }
+  .val { font-size: 30px; font-weight: 700; }
+  .val.left  { text-align: right; }
+  .val.right { text-align: left; }
+  .val.gold  { color: #ffd700; }
+  .val.dim   { color: #556677; }
+  .val.red   { color: #ff5555; }
   .label { text-align: center; font-size: 13px; color: #8899aa; white-space: nowrap; }
-  .highlight { color: #00d4ff; }
   .caption {
-    font-size: 19px; color: #00d4ff; font-weight: 600; letter-spacing: 0.06em;
-    border-top: 1px solid rgba(0,212,255,0.3); padding-top: 20px; width: 860px; text-align: center;
+    font-size: 20px; color: #00d4ff; font-weight: 700; letter-spacing: 0.04em;
+    text-align: center;
   }
 </style>
 </head>
 <body>
-  <div class="header">FIFA World Cup 2026 — History's Smallest Nations</div>
+  <div class="header">FIFA WORLD CUP 2026 · GROUP A · JUNE 12 · ESTADIO AZTECA</div>
 
   <div class="teams">
-    <div class="team">
-      <span class="team-flag">🏝️</span>
-      <span class="team-name highlight">キュラソー</span>
-      <span class="team-year">2026年 — 新記録</span>
+    <div class="team-block">
+      <span style="font-size:36px;">🇲🇽 メキシコ</span>
+      <span class="team-label">2026年 開幕戦</span>
     </div>
-    <span class="vs">VS</span>
-    <div class="team">
-      <span class="team-flag">🇮🇸</span>
-      <span class="team-name">アイスランド</span>
-      <span class="team-year">2018年 — 旧記録</span>
+    <div class="divider">VS</div>
+    <div class="team-block">
+      <span style="font-size:36px;">📅 過去7大会</span>
+      <span class="team-label">1930〜2022年 開幕戦</span>
     </div>
   </div>
 
   <div class="stats">
     <div class="stat-row">
-      <span class="val left highlight">156,000人</span>
-      <span class="label">人　口</span>
-      <span class="val right">350,000人</span>
+      <span class="val left gold">1勝</span>
+      <span class="label">勝利数</span>
+      <span class="val right red">0勝</span>
     </div>
     <div class="stat-row">
-      <span class="val left highlight">443 km²</span>
-      <span class="label">国土面積</span>
-      <span class="val right">103,000 km²</span>
+      <span class="val left">0敗</span>
+      <span class="label">敗北数</span>
+      <span class="val right">5敗</span>
     </div>
     <div class="stat-row">
-      <span class="val left highlight">7勝3分0敗</span>
-      <span class="label">予選成績</span>
-      <span class="val right">—</span>
+      <span class="val left">0分</span>
+      <span class="label">引き分け</span>
+      <span class="val right">2分</span>
     </div>
     <div class="stat-row">
-      <span class="val left highlight">✓ ギネス認定</span>
-      <span class="label">W杯最小国</span>
-      <span class="val right">✓ 旧ギネス</span>
+      <span class="val left" style="font-size:22px;">2026年</span>
+      <span class="label">初勝利までの年数</span>
+      <span class="val right dim" style="font-size:20px;">96年待ち</span>
+    </div>
+    <div class="stat-row">
+      <span class="val left" style="font-size:20px; color:#ffd700;">歴史的快挙</span>
+      <span class="label">1930年W杯第1号ゴールの相手が</span>
+      <span class="val right dim" style="font-size:20px;">今日も戦った</span>
     </div>
   </div>
 
-  <div class="caption">W杯史上最小国 記録を塗り替えた — 人口16万人の奇跡</div>
+  <div class="caption">7試合0勝の呪縛——96年後にアステカで解けた</div>
 </body>
 </html>

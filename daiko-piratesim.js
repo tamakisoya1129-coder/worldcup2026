@@ -399,7 +399,7 @@ function psDraw() {
     const fogAlpha = ent.depth < 0.18 ? ent.depth / 0.18 : 1.0;
     if(fogAlpha < 1) ctx.save(), ctx.globalAlpha = fogAlpha;
     if(ent._kind==='enemy'){
-      drawPSEnemyFront(ctx,sx,sy,scale,ent.color,ent.type,ent.hp/ent.maxHp);
+      // 3D mesh via Three.js — skip 2D hull drawing
       if(ent.depth>.28){
         const bw=60*scale, bh=Math.max(2,5*scale), by=sy-42*scale;
         ctx.fillStyle='rgba(0,0,0,.6)'; ctx.fillRect(sx-bw/2,by,bw,bh);
@@ -922,6 +922,80 @@ function endPirateSim(sunk) {
 ══════════════════════════════════════════════════ */
 let _psThree = null;
 
+
+function _makeEnemy3D() {
+  const g = new THREE.Group();
+  const hullM  = new THREE.MeshPhongMaterial({ color: 0x110c06 });
+  const colorM = new THREE.MeshPhongMaterial({ color: 0x4a6a9a, side: THREE.DoubleSide });
+  const mastM  = new THREE.MeshPhongMaterial({ color: 0x1a0e04 });
+  const sailM  = new THREE.MeshPhongMaterial({ color: 0xb8aa78, side: THREE.DoubleSide });
+  const flagM  = new THREE.MeshPhongMaterial({ color: 0x880010, side: THREE.DoubleSide });
+  const fhM    = new THREE.MeshPhongMaterial({ color: 0xd0a010, emissive: 0x503800 });
+
+  // Outer dark hull
+  const hull = new THREE.Mesh(new THREE.BoxGeometry(4.8, 1.6, 8.0), hullM);
+  hull.position.y = 0.8;
+  g.add(hull);
+  // Colored hull
+  const cHull = new THREE.Mesh(new THREE.BoxGeometry(4.3, 1.3, 7.5), colorM);
+  cHull.position.y = 0.82;
+  g.add(cHull);
+  // Bow cone → +Z (toward camera)
+  const bow = new THREE.Mesh(new THREE.ConeGeometry(0.88, 3.2, 6), hullM);
+  bow.rotation.x = -Math.PI / 2;
+  bow.position.set(0, 0.88, 5.1);
+  g.add(bow);
+  // Figurehead
+  const fh = new THREE.Mesh(new THREE.SphereGeometry(0.22, 6, 4), fhM);
+  fh.position.set(0, 0.95, 6.6);
+  g.add(fh);
+
+  // Main mast
+  const mm = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.18, 10.5, 8), mastM);
+  mm.position.set(0, 7.05, -0.4);
+  g.add(mm);
+  // Fore masts × 2
+  [[-1.7, 8.0], [1.7, 8.0]].forEach(([mx, mh]) => {
+    const fm = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, mh, 7), mastM);
+    fm.position.set(mx, mh * 0.5 + 1.55, 1.2);
+    g.add(fm);
+  });
+
+  // Yardarms
+  const ya1 = new THREE.Mesh(new THREE.BoxGeometry(10.5, 0.23, 0.23), mastM);
+  ya1.position.set(0, 11.3, -0.4);
+  g.add(ya1);
+  const ya2 = new THREE.Mesh(new THREE.BoxGeometry(7.8, 0.20, 0.20), mastM);
+  ya2.position.set(0, 8.0, -0.4);
+  g.add(ya2);
+
+  // Main sail (faces +Z → visible bow-on)
+  const ms = new THREE.Mesh(new THREE.PlaneGeometry(10.0, 5.8), sailM);
+  ms.position.set(0, 8.6, -0.4);
+  g.add(ms);
+  // Top sail
+  const ts = new THREE.Mesh(new THREE.PlaneGeometry(7.5, 3.4), sailM);
+  ts.position.set(0, 10.6, -0.4);
+  g.add(ts);
+  // Fore sails × 2
+  [[-1.7, 4.2], [1.7, 4.2]].forEach(([mx, sy]) => {
+    const fs = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 3.8), sailM);
+    fs.position.set(mx, sy, 1.2);
+    g.add(fs);
+  });
+
+  // Flag
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.9), flagM);
+  fl.position.set(0.7, 12.3, -0.4);
+  g.add(fl);
+
+  // Material refs for color updates
+  g._colorMat = colorM;
+  g._sailMat  = sailM;
+  g._flagMat  = flagM;
+  return g;
+}
+
 function initPSOcean(cssW, cssH) {
   if (typeof THREE === 'undefined') return;
 
@@ -1170,7 +1244,21 @@ function initPSOcean(cssW, cssH) {
     hShips.push(ship);
   }
 
-  _psThree = { renderer, scene, camera, mat, foamMat, wakeMat, hShips };
+
+  // ── Enemy ship mesh pool (synced each frame) ──
+  const ENEMY_POOL = 8;
+  const enemyPool  = [];
+  for (let i = 0; i < ENEMY_POOL; i++) {
+    const g = _makeEnemy3D();
+    g.visible = false;
+    scene.add(g);
+    enemyPool.push(g);
+  }
+  const psRaycaster  = new THREE.Raycaster();
+  const psOceanPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+
+  _psThree = { renderer, scene, camera, mat, foamMat, wakeMat, hShips,
+               enemyPool, psRaycaster, psOceanPlane };
 }
 
 function renderPSOcean() {
@@ -1185,6 +1273,58 @@ function renderPSOcean() {
       ship.position.x = ship.userData.baseX + travelX;
       if (ship.position.x > 110) ship.position.x -= 220;
       if (ship.position.x < -110) ship.position.x += 220;
+    }
+  }
+
+  // ── Sync 3D enemy meshes with game state ──
+  if (_psThree.enemyPool && typeof PS !== 'undefined' && PS.enemies) {
+    const pool    = _psThree.enemyPool;
+    const enemies = PS.enemies;
+    const rc      = _psThree.psRaycaster;
+    const plane   = _psThree.psOceanPlane;
+    const cam     = _psThree.camera;
+    const LW = PS.LW, LH = PS.LH;
+    // focal length: (LH/2)/tan(FOV_v/2) for FOV=60°
+    const focalPx = 416;
+    const hullPx  = 104; // 2D hull pixel width at scale=1
+    const hullW   =  4.5; // 3D hull world width at mesh scale=1
+
+    for (let i = 0; i < pool.length; i++) {
+      const mesh = pool[i];
+      if (i >= enemies.length) { mesh.visible = false; continue; }
+      const ent = enemies[i];
+      const sx = PS.LW/2 + (ent.worldX - PS.player.x) * ent.depth * 2.6;
+      const sy = Math.round(LH * PS.HY_RATIO) + (LH - Math.round(LH * PS.HY_RATIO)) * ent.depth * 0.88;
+      if (sx < -300 || sx > LW + 300) { mesh.visible = false; continue; }
+
+      // Project 2D screen pos → 3D ocean plane
+      const ndcX = (sx / LW) * 2 - 1;
+      const ndcY = -(sy / LH) * 2 + 1;
+      rc.setFromCamera(new THREE.Vector2(ndcX, ndcY), cam);
+      const wp = new THREE.Vector3();
+      if (!rc.ray.intersectPlane(plane, wp)) { mesh.visible = false; continue; }
+
+      // Scale to match 2D visual size
+      const s2D = Math.max(.06, ent.depth * 1.7 + .06);
+      const dist = cam.position.distanceTo(wp);
+      const s = s2D * hullPx * dist / (focalPx * hullW);
+      mesh.scale.setScalar(s);
+
+      // Position on water + small bob
+      mesh.position.set(wp.x, Math.sin(t * 1.1 + i * 1.8) * 0.12, wp.z);
+
+      // Bow faces camera
+      mesh.rotation.y = Math.atan2(cam.position.x - wp.x, cam.position.z - wp.z);
+
+      // Ship type colors
+      const C = { pirate: 0x3a1a1a, navy: 0x1a3060, merchant: 0x4a6a9a };
+      const S = { pirate: 0x141010, navy: 0xd0cdb8, merchant: 0xb8aa78 };
+      const F = { pirate: 0x080808, navy: 0x102060, merchant: 0x880010 };
+      if (mesh._colorMat) mesh._colorMat.color.setHex(C[ent.type] || C.merchant);
+      if (mesh._sailMat)  mesh._sailMat.color.setHex(S[ent.type]  || S.merchant);
+      if (mesh._flagMat)  mesh._flagMat.color.setHex(F[ent.type]  || F.merchant);
+
+      mesh.visible = true;
     }
   }
   _psThree.renderer.render(_psThree.scene, _psThree.camera);

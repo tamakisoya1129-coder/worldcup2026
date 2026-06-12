@@ -981,7 +981,7 @@ function initPSOcean(cssW, cssH) {
   if (typeof THREE === 'undefined') return;
 
   const tc = document.getElementById('psThreeCanvas');
-  if (\!tc) return;
+  if (!tc) return;
 
   // Dispose previous instance
   if (_psThree) { _psThree.renderer.dispose(); _psThree = null; }
@@ -1243,7 +1243,7 @@ function initPSOcean(cssW, cssH) {
 }
 
 function renderPSOcean() {
-  if (\!_psThree) return;
+  if (!_psThree) return;
   const t = Date.now() * 0.001;
   _psThree.mat.uniforms.uTime.value = t;
   if (_psThree.foamMat) _psThree.foamMat.uniforms.uTime.value = t;
@@ -1316,7 +1316,7 @@ function renderPSOcean() {
 }
 
 function disposePSOcean() {
-  if (\!_psThree) return;
+  if (!_psThree) return;
   _psThree.renderer.dispose();
   const tc = document.getElementById('psThreeCanvas');
   if (tc) tc.style.display = 'none';

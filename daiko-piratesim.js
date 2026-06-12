@@ -977,6 +977,89 @@ function _makeEnemy3D() {
   return g;
 }
 
+
+function _makePlayerHull() {
+  const g = new THREE.Group();
+  const hM  = new THREE.MeshPhongMaterial({ color: 0x1a0e06, shininess: 110, specular: new THREE.Color(0x1a2233) });
+  const sM  = new THREE.MeshPhongMaterial({ color: 0x361a0a, shininess: 35 });
+  const dM  = new THREE.MeshPhongMaterial({ color: 0x2a1608 });
+  const rM  = new THREE.MeshPhongMaterial({ color: 0x0f0804 });
+  const lM  = new THREE.MeshPhongMaterial({ color: 0xffbb40, emissive: 0xaa5500 });
+  const cM  = new THREE.MeshPhongMaterial({ color: 0x1c1c1c, shininess: 100 });
+
+  // Hull body (wide, seen bow-on from slightly behind)
+  const hull = new THREE.Mesh(new THREE.BoxGeometry(9.0, 2.4, 7.0), hM);
+  hull.position.y = 1.2;
+  g.add(hull);
+  // Colored hull stripe
+  const stripe = new THREE.Mesh(new THREE.BoxGeometry(8.5, 1.9, 6.6), sM);
+  stripe.position.y = 1.25;
+  g.add(stripe);
+  // Deck surface
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(8.2, 0.2, 6.5), dM);
+  deck.position.y = 2.5;
+  g.add(deck);
+  // Stern structure / cabin
+  const cabin = new THREE.Mesh(new THREE.BoxGeometry(8.0, 1.6, 1.8), hM);
+  cabin.position.set(0, 3.5, -2.6);
+  g.add(cabin);
+  // Cabin windows (emissive yellow)
+  const wM = new THREE.MeshPhongMaterial({ color: 0xffcc66, emissive: 0xaa7700 });
+  [-2.2, 0, 2.2].forEach(wx => {
+    const win = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.55, 0.1), wM);
+    win.position.set(wx, 3.55, -3.55);
+    g.add(win);
+  });
+
+  // Railing posts (port + starboard)
+  for (let z = -2.5; z <= 2.5; z += 1.25) {
+    const p = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.065, 1.1, 5), rM);
+    p.position.set(4.6, 2.95, z); g.add(p);
+    const p2 = p.clone(); p2.position.x = -4.6; g.add(p2);
+  }
+  // Rail bar
+  const rb = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 6.2), rM);
+  rb.position.set(4.6, 3.42, 0); g.add(rb);
+  const rb2 = rb.clone(); rb2.position.x = -4.6; g.add(rb2);
+
+  // Stern lanterns
+  [-1.2, 1.2].forEach(lx => {
+    const l = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 6), lM);
+    l.position.set(lx, 4.4, -3.5);
+    g.add(l);
+  });
+
+  // Cannons (port + starboard, 2 per side)
+  [-1.8, 1.8].forEach(cz => {
+    const cr = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.14, 1.4, 8), cM);
+    cr.rotation.z = Math.PI / 2;
+    cr.position.set(4.8, 2.55, cz); g.add(cr);
+    const cl = cr.clone(); cl.position.x = -4.8; g.add(cl);
+  });
+
+  // Main mast (short – just the base above deck, most hidden off-screen top)
+  const mastM = new THREE.MeshPhongMaterial({ color: 0x1c0c04, shininess: 30 });
+  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.22, 6.0, 8), mastM);
+  mast.position.set(0, 5.5, 0.5);
+  g.add(mast);
+  // Yardarm
+  const ya = new THREE.Mesh(new THREE.BoxGeometry(9.2, 0.2, 0.2), mastM);
+  ya.position.set(0, 8.4, 0.5);
+  g.add(ya);
+  // Main sail (hangs from yardarm, faces camera = faces +z)
+  const sailM = new THREE.MeshPhongMaterial({ color: 0xccc09a, side: THREE.DoubleSide, shininess: 8 });
+  const sail = new THREE.Mesh(new THREE.PlaneGeometry(8.8, 4.5), sailM);
+  sail.position.set(0, 6.2, 0.5);
+  g.add(sail);
+  // Jolly Roger flag
+  const flagM = new THREE.MeshPhongMaterial({ color: 0x0d0d0d, side: THREE.DoubleSide });
+  const flag = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.9), flagM);
+  flag.position.set(0.7, 9.5, 0.5);
+  g.add(flag);
+
+  return g;
+}
+
 function initPSOcean(cssW, cssH) {
   if (typeof THREE === 'undefined') return;
 
@@ -1000,10 +1083,12 @@ function initPSOcean(cssW, cssH) {
   }
 
   const W = cssW, H = cssH;
-  const renderer = new THREE.WebGLRenderer({ canvas: tc, antialias: false });
+  const renderer = new THREE.WebGLRenderer({ canvas: tc, antialias: true });
   renderer.setSize(W, H, false);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.0));
   renderer.setClearColor(0x00060e);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.88;
 
   const scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2(0x000c20, 0.022);
@@ -1238,8 +1323,14 @@ function initPSOcean(cssW, cssH) {
   const psRaycaster  = new THREE.Raycaster();
   const psOceanPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
 
+  // ── Player ship hull (foreground, stern toward camera) ──
+  const playerHullMesh = _makePlayerHull();
+  playerHullMesh.rotation.y = Math.PI;  // bow faces -z (toward enemies)
+  playerHullMesh.position.set(0, 0, 19);
+  scene.add(playerHullMesh);
+
   _psThree = { renderer, scene, camera, mat, foamMat, wakeMat, hShips,
-               enemyPool, psRaycaster, psOceanPlane };
+               enemyPool, psRaycaster, psOceanPlane, playerHullMesh };
 }
 
 function renderPSOcean() {
@@ -1248,6 +1339,12 @@ function renderPSOcean() {
   _psThree.mat.uniforms.uTime.value = t;
   if (_psThree.foamMat) _psThree.foamMat.uniforms.uTime.value = t;
   if (_psThree.wakeMat) _psThree.wakeMat.uniforms.uTime.value = t;
+  if (_psThree.playerHullMesh) {
+    const ph = _psThree.playerHullMesh;
+    ph.position.y = Math.sin(t * 0.85) * 0.18;
+    ph.rotation.z = Math.sin(t * 0.65 + 0.8) * 0.022;  // gentle roll
+    ph.rotation.x = Math.sin(t * 1.05 + 1.5) * 0.010;  // slight pitch
+  }
   if (_psThree.hShips) {
     for (const ship of _psThree.hShips) {
       const travelX = (t * ship.userData.speed * ship.userData.dir) % 220;

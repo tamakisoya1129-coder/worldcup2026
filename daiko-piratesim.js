@@ -399,7 +399,7 @@ function psDraw() {
     const fogAlpha = ent.depth < 0.18 ? ent.depth / 0.18 : 1.0;
     if(fogAlpha < 1) ctx.save(), ctx.globalAlpha = fogAlpha;
     if(ent._kind==='enemy'){
-      // 3D mesh via Three.js — skip 2D hull drawing
+      if (!ent._has3D) drawPSEnemyFront(ctx,sx,sy,scale,ent.color,ent.type,ent.hp/ent.maxHp);
       if(ent.depth>.28){
         const bw=60*scale, bh=Math.max(2,5*scale), by=sy-42*scale;
         ctx.fillStyle='rgba(0,0,0,.6)'; ctx.fillRect(sx-bw/2,by,bw,bh);
@@ -925,71 +925,52 @@ let _psThree = null;
 
 function _makeEnemy3D() {
   const g = new THREE.Group();
+  // Shared materials (fewer objects = lighter WebGL load)
   const hullM  = new THREE.MeshPhongMaterial({ color: 0x110c06 });
   const colorM = new THREE.MeshPhongMaterial({ color: 0x4a6a9a, side: THREE.DoubleSide });
   const mastM  = new THREE.MeshPhongMaterial({ color: 0x1a0e04 });
   const sailM  = new THREE.MeshPhongMaterial({ color: 0xb8aa78, side: THREE.DoubleSide });
   const flagM  = new THREE.MeshPhongMaterial({ color: 0x880010, side: THREE.DoubleSide });
-  const fhM    = new THREE.MeshPhongMaterial({ color: 0xd0a010, emissive: 0x503800 });
 
-  // Outer dark hull
-  const hull = new THREE.Mesh(new THREE.BoxGeometry(4.8, 1.6, 8.0), hullM);
+  // Hull (two-layer: dark outer + colored inner)
+  const hull  = new THREE.Mesh(new THREE.BoxGeometry(4.8, 1.6, 8.0), hullM);
   hull.position.y = 0.8;
   g.add(hull);
-  // Colored hull
   const cHull = new THREE.Mesh(new THREE.BoxGeometry(4.3, 1.3, 7.5), colorM);
   cHull.position.y = 0.82;
   g.add(cHull);
-  // Bow cone → +Z (toward camera)
-  const bow = new THREE.Mesh(new THREE.ConeGeometry(0.88, 3.2, 6), hullM);
+
+  // Bow cone pointing toward camera (+Z)
+  const bow = new THREE.Mesh(new THREE.ConeGeometry(0.85, 3.0, 5), hullM);
   bow.rotation.x = -Math.PI / 2;
-  bow.position.set(0, 0.88, 5.1);
+  bow.position.set(0, 0.85, 5.0);
   g.add(bow);
-  // Figurehead
-  const fh = new THREE.Mesh(new THREE.SphereGeometry(0.22, 6, 4), fhM);
-  fh.position.set(0, 0.95, 6.6);
-  g.add(fh);
 
-  // Main mast
-  const mm = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.18, 10.5, 8), mastM);
-  mm.position.set(0, 7.05, -0.4);
-  g.add(mm);
-  // Fore masts × 2
-  [[-1.7, 8.0], [1.7, 8.0]].forEach(([mx, mh]) => {
-    const fm = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, mh, 7), mastM);
-    fm.position.set(mx, mh * 0.5 + 1.55, 1.2);
-    g.add(fm);
-  });
+  // Main mast (single, center)
+  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.18, 11.0, 6), mastM);
+  mast.position.set(0, 7.3, -0.4);
+  g.add(mast);
 
-  // Yardarms
-  const ya1 = new THREE.Mesh(new THREE.BoxGeometry(10.5, 0.23, 0.23), mastM);
-  ya1.position.set(0, 11.3, -0.4);
-  g.add(ya1);
-  const ya2 = new THREE.Mesh(new THREE.BoxGeometry(7.8, 0.20, 0.20), mastM);
-  ya2.position.set(0, 8.0, -0.4);
-  g.add(ya2);
+  // Single yardarm
+  const ya = new THREE.Mesh(new THREE.BoxGeometry(10.5, 0.22, 0.22), mastM);
+  ya.position.set(0, 11.8, -0.4);
+  g.add(ya);
 
-  // Main sail (faces +Z → visible bow-on)
-  const ms = new THREE.Mesh(new THREE.PlaneGeometry(10.0, 5.8), sailM);
-  ms.position.set(0, 8.6, -0.4);
-  g.add(ms);
+  // Main sail (large, faces camera from bow-on view)
+  const sail = new THREE.Mesh(new THREE.PlaneGeometry(10.0, 7.0), sailM);
+  sail.position.set(0, 8.4, -0.4);
+  g.add(sail);
+
   // Top sail
-  const ts = new THREE.Mesh(new THREE.PlaneGeometry(7.5, 3.4), sailM);
-  ts.position.set(0, 10.6, -0.4);
-  g.add(ts);
-  // Fore sails × 2
-  [[-1.7, 4.2], [1.7, 4.2]].forEach(([mx, sy]) => {
-    const fs = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 3.8), sailM);
-    fs.position.set(mx, sy, 1.2);
-    g.add(fs);
-  });
+  const topSail = new THREE.Mesh(new THREE.PlaneGeometry(7.0, 3.5), sailM);
+  topSail.position.set(0, 11.0, -0.4);
+  g.add(topSail);
 
-  // Flag
-  const fl = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 0.9), flagM);
-  fl.position.set(0.7, 12.3, -0.4);
-  g.add(fl);
+  // Flag at masthead
+  const flag = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.85), flagM);
+  flag.position.set(0.65, 12.8, -0.4);
+  g.add(flag);
 
-  // Material refs for color updates
   g._colorMat = colorM;
   g._sailMat  = sailM;
   g._flagMat  = flagM;
@@ -1277,7 +1258,9 @@ function renderPSOcean() {
   }
 
   // ── Sync 3D enemy meshes with game state ──
-  if (_psThree.enemyPool && typeof PS !== 'undefined' && PS.enemies) {
+  try {
+  if (_psThree.enemyPool && typeof PS !== 'undefined' && PS.enemies && PS.player) {
+    PS.enemies.forEach(e => { e._has3D = false; });
     const pool    = _psThree.enemyPool;
     const enemies = PS.enemies;
     const rc      = _psThree.psRaycaster;
@@ -1325,8 +1308,10 @@ function renderPSOcean() {
       if (mesh._flagMat)  mesh._flagMat.color.setHex(F[ent.type]  || F.merchant);
 
       mesh.visible = true;
+      ent._has3D = true;
     }
   }
+  } catch(e) { /* Three.js sync error — 2D fallback active */ }
   _psThree.renderer.render(_psThree.scene, _psThree.camera);
 }
 

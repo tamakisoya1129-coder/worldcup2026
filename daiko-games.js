@@ -643,7 +643,7 @@ function checkAnswer(choice, c, btn) {
     updateHUD();
     fb.className = 'answer-fb fb-correct';
     fb.innerHTML = `${c.flag} <strong>${c.name}</strong> — 正解！<br>
-      <span style="font-size:13px;font-weight:400;color:#80e898">
+      <span style="font-size:22px;font-weight:400;color:#80e898">
         ヒント${G.hints}で正解 → +${earned}G${mult > 1 ? ' (コンボ×' + mult + ')' : ''}
         ${G.combo >= 3 ? ' &nbsp; 🔥 ' + G.combo + '連続！' : ''}
       </span>`;
@@ -656,7 +656,7 @@ function checkAnswer(choice, c, btn) {
     updateHUD();
     fb.className = 'answer-fb fb-wrong';
     fb.innerHTML = `✗ 外れ…  正解は ${c.flag} <strong>${c.name}</strong><br>
-      <span style="font-size:13px;font-weight:400;color:#e06070">
+      <span style="font-size:22px;font-weight:400;color:#e06070">
         ❤️ が1つ消えた${G.hp === 0 ? ' — 最後の一撃だ…' : ''}
       </span>`;
   }
@@ -684,7 +684,7 @@ function renderAchievements(containerId) {
   const el = document.getElementById(containerId);
   const earned = ACHIEVEMENTS.filter(a => a.check(G));
   if (!earned.length) { el.innerHTML = ''; return; }
-  el.innerHTML = '<p style="font-size:10px;font-weight:800;color:#5a4020;letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px">【獲得実績】</p>' +
+  el.innerHTML = '<p style="font-size:20px;font-weight:800;color:#5a4020;letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px">【獲得実績】</p>' +
     earned.map(a => `
       <div class="achieve-item">
         <span class="achieve-icon">${a.icon}</span>

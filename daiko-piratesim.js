@@ -907,6 +907,7 @@ function endPirateSim(sunk) {
   document.getElementById('psResultDetail').textContent='撃沈 '+ps.enemiesSunk+'隻';
   document.getElementById('psResult').style.display='flex';
 
+  saveHSList('pirate', { score: ps.gold, sunk: ps.enemiesSunk, date: new Date().toLocaleDateString('ja-JP') });
   const best=parseInt(localStorage.getItem('psGoldBest')||'0');
   if(ps.gold>best){
     localStorage.setItem('psGoldBest',ps.gold);

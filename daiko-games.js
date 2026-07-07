@@ -338,6 +338,29 @@ function renderHS() {
     </div>`).join('');
 }
 
+
+function getHSList(key) {
+  return JSON.parse(localStorage.getItem('daiko_' + key + '_hs') || '[]');
+}
+function saveHSList(key, entry) {
+  const list = getHSList(key);
+  list.push(entry);
+  list.sort((a, b) => b.score - a.score);
+  localStorage.setItem('daiko_' + key + '_hs', JSON.stringify(list.slice(0, 3)));
+}
+function renderHSList(key, containerId, metaFn) {
+  const list = getHSList(key);
+  const el = document.getElementById(containerId);
+  if (\!el) return;
+  if (\!list.length) { el.innerHTML = '<p class="hs-empty" style="text-align:center;padding:6px 0">まだ記録なし</p>'; return; }
+  el.innerHTML = list.map((s, i) => `
+    <div class="hs-row">
+      <span class="hs-rank">${['🥇','🥈','🥉'][i]}</span>
+      <span class="hs-score">${s.score}G</span>
+      <span class="hs-meta">${metaFn(s)}</span>
+    </div>`).join('');
+}
+
 /* ═══ COMBO ═══ */
 function getMultiplier() {
   if (G.combo >= 5) return 2.0;
@@ -471,6 +494,11 @@ function showTitle() {
   const vBest = localStorage.getItem('voyageBest');
   document.getElementById('voyageBest').textContent = vBest ? `記録: ${vBest}` : '記録: -';
   // API key status
+  renderHS();
+  renderHSList('cannon',   'hsListCannon',   s => `コンボ ${s.combo} | ${s.date}`);
+  renderHSList('treasure', 'hsListTreasure', s => `WAVE ${s.wave} | ${s.diff} | ${s.date}`);
+  renderHSList('voyage',   'hsListVoyage',   s => `第${s.round}海域 | ${s.date}`);
+  renderHSList('pirate',   'hsListPirate',   s => `撃沈 ${s.sunk}隻 | ${s.date}`);
   showScreen('title');
 }
 
@@ -964,6 +992,7 @@ function addSplash(x, y) {
 function endCannon() {
   CG.running = false;
   clearInterval(CG.timerInterval);
+  saveHSList('cannon', { score: CG.gold, combo: CG.maxCombo, date: new Date().toLocaleDateString('ja-JP') });
   const prev = parseInt(localStorage.getItem('cannonBest') || '0');
   const isHS = CG.gold > prev;
   if (isHS) localStorage.setItem('cannonBest', CG.gold);
@@ -1619,6 +1648,7 @@ function endTreasure(survived, timeout) {
   const speedBonus = survived ? TG.timerLeft * 2 : 0;
   TG.gold += speedBonus;
 
+  saveHSList('treasure', { score: TG.gold, wave: TG.wave, diff: TG.diff === 'hard' ? '難' : '普通', date: new Date().toLocaleDateString('ja-JP') });
   const prev = parseInt(localStorage.getItem('treasureBest') || '0');
   const isHS = TG.gold > prev;
   if (isHS) localStorage.setItem('treasureBest', TG.gold);
@@ -2268,6 +2298,7 @@ function voyAfterEvent() {
 function voyVictory() {
   const hpBonus = VG.ship.hp * 3, rBonus = VG.round * 15;
   VG.score = VG.gold + hpBonus + rBonus;
+  saveHSList('voyage', { score: VG.score, round: VG.round, date: new Date().toLocaleDateString('ja-JP') });
   const prev = parseInt(localStorage.getItem('voyageBest') || '0');
   const isHS = VG.score > prev;
   if (isHS) localStorage.setItem('voyageBest', VG.score);
@@ -2283,6 +2314,7 @@ function voyVictory() {
 
 function voyGameOver() {
   VG.score = VG.gold + (VG.round - 1) * 12;
+  saveHSList('voyage', { score: VG.score, round: VG.round, date: new Date().toLocaleDateString('ja-JP') });
   const prev = parseInt(localStorage.getItem('voyageBest') || '0');
   const isHS = VG.score > prev;
   if (isHS) localStorage.setItem('voyageBest', VG.score);

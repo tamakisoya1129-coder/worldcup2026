@@ -319,6 +319,13 @@
   .rule-body { font-size: 12px; color: #7a6040; line-height: 1.7; }
   .rule-body b { color: #b08040; }
 
+  /* Rankings section */
+  .hs-section {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 12px; padding: 12px 8px; width: 100%; max-width: 720px; margin: 0 auto;
+  }
+  .hs-section .hs-box { flex: 1 1 180px; min-width: 160px; max-width: 260px; margin-bottom: 0; }
+
   /* High score table */
   .hs-box {
     max-width: 320px; width: 100%;

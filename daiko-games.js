@@ -351,8 +351,8 @@ function saveHSList(key, entry) {
 function renderHSList(key, containerId, metaFn) {
   const list = getHSList(key);
   const el = document.getElementById(containerId);
-  if (\!el) return;
-  if (\!list.length) { el.innerHTML = '<p class="hs-empty" style="text-align:center;padding:6px 0">まだ記録なし</p>'; return; }
+  if (!el) return;
+  if (!list.length) { el.innerHTML = '<p class="hs-empty" style="text-align:center;padding:6px 0">まだ記録なし</p>'; return; }
   el.innerHTML = list.map((s, i) => `
     <div class="hs-row">
       <span class="hs-rank">${['🥇','🥈','🥉'][i]}</span>
@@ -493,12 +493,23 @@ function showTitle() {
   // Voyage best
   const vBest = localStorage.getItem('voyageBest');
   document.getElementById('voyageBest').textContent = vBest ? `記録: ${vBest}` : '記録: -';
+  // Pirate best（海賊シム）
+  const pBest = localStorage.getItem('psGoldBest');
+  const pLeg  = localStorage.getItem('psGoldBestLeg');
+  const pEl   = document.getElementById('pirateBest');
+  if (pEl) pEl.textContent = pBest ? `記録: ${pBest}G${pLeg ? `（第${pLeg}海域）` : ''}` : '記録: -';
+  // カード枚数は数えて表示する（増減しても文言がずれない）
+  const sub = document.getElementById('titleSub');
+  if (sub) {
+    const n = document.querySelectorAll('.game-hub .game-card').length;
+    sub.textContent = `${n} GAMES AVAILABLE — SELECT YOUR QUEST`;
+  }
   // API key status
   renderHS();
   renderHSList('cannon',   'hsListCannon',   s => `コンボ ${s.combo} | ${s.date}`);
   renderHSList('treasure', 'hsListTreasure', s => `WAVE ${s.wave} | ${s.diff} | ${s.date}`);
   renderHSList('voyage',   'hsListVoyage',   s => `第${s.round}海域 | ${s.date}`);
-  renderHSList('pirate',   'hsListPirate',   s => `撃沈 ${s.sunk}隻 | ${s.date}`);
+  renderHSList('pirate',   'hsListPirate',   s => `${s.leg ? `第${s.leg}海域 | ` : ''}撃沈 ${s.sunk}隻 | ${s.date}`);
   showScreen('title');
 }
 

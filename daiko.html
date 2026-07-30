@@ -55,7 +55,7 @@
 
   <p class="eyebrow" style="color:rgba(0,210,255,.6);letter-spacing:.35em">// VIRTUAL SEAS — CONNECTING...</p>
   <h1 class="title-main">大航海ゲーム</h1>
-  <p class="title-sub">3 GAMES AVAILABLE — SELECT YOUR QUEST</p>
+  <p class="title-sub" id="titleSub">SELECT YOUR QUEST</p>
 
   <div class="game-hub">
     <div class="game-card" onclick="startGame()">
@@ -84,8 +84,8 @@
     </div>
     <div class="game-card" onclick="startPirateSim()">
       <span class="game-card-icon">🏴‍☠️</span>
-      <div class="game-card-title">海賊船シミュレーター</div>
-      <div class="game-card-desc">海を駆けろ！商船・海賊・軍艦を砲撃して金貨を稼げ。WASD/矢印キーで操舵、スペースで砲撃</div>
+      <div class="game-card-title">七つの海の覇者</div>
+      <div class="game-card-desc">海域を進むローグライト航海バトル。6種の敵艦と2種のボス、風と天候を読み、補給港で船を強化して深海へ挑め</div>
       <div class="game-card-best" id="pirateBest">記録: -</div>
     </div>
   </div>
@@ -114,7 +114,7 @@
 </div>
 
 
-<\!-- ══════════════════ QUIZ API KEY PROMPT ══════════════════ -->
+<!-- ══════════════════ QUIZ API KEY PROMPT ══════════════════ -->
 <div id="quizApiPrompt" class="api-modal-bg" style="display:none">
   <div class="api-modal">
     <h3 class="api-modal-title">🤖 AIクイズを開始します</h3>
@@ -128,7 +128,7 @@
   </div>
 </div>
 
-<\!-- ══════════════════ SAIL ══════════════════ -->
+<!-- ══════════════════ SAIL ══════════════════ -->
 <div id="screen-sail" class="screen">
   <div class="sail-lightning"></div>
   <svg class="sail-ship-svg" viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg">
@@ -548,36 +548,93 @@
 <!-- ══════════════════ PIRATE SIM ══════════════════ -->
 <div id="screen-piratesim" class="screen">
   <div class="ps-header">
-    <button class="btn-back-menu" onclick="exitPirateSim()">← 戻る</button>
+    <button class="btn-back-menu" onclick="exitPirateSim()">←</button>
     <div class="ps-hud-hp">
       <div class="ps-hud-hp-label" id="psHpLabel">HP 100/100</div>
       <div class="ps-hud-hp-bar-wrap"><div class="ps-hud-hp-bar" id="psHpBar" style="width:100%"></div></div>
     </div>
+    <div class="ps-hud-item ps-hud-leg"   id="psLegHud">🧭 第1海域</div>
+    <div class="ps-hud-item ps-hud-quota" id="psQuotaHud">☠ 0/6</div>
     <div class="ps-hud-item" id="psGoldHud">💰 0G</div>
-    <div class="ps-hud-wind" id="psWindHud">🌬 北</div>
-    <div class="ps-hud-timer" id="psTimerHud">90</div>
+    <div class="ps-hud-item ps-hud-combo" id="psComboHud" style="display:none">🔥 x1.00</div>
+    <div class="ps-hud-wind"  id="psWindHud">🌬 北 ●</div>
+    <div class="ps-hud-timer" id="psTimerHud">0:00</div>
   </div>
-  <canvas id="psThreeCanvas"></canvas>
-  <canvas id="psCanvas"></canvas>
-  <div class="ps-mobile-controls" style="display:flex;gap:10px;justify-content:center;padding:10px;max-width:240px;margin:4px auto 0">
-    <button class="ps-btn ps-btn-left"  style="flex:1" ontouchstart="psKey('left',true);event.preventDefault()"  ontouchend="psKey('left',false)">◀</button>
-    <button class="ps-btn ps-btn-fire"  style="flex:1" ontouchstart="psFirePlayer();event.preventDefault()">💥</button>
-    <button class="ps-btn ps-btn-right" style="flex:1" ontouchstart="psKey('right',true);event.preventDefault()" ontouchend="psKey('right',false)">▶</button>
+
+  <div class="ps-stage">
+    <canvas id="psThreeCanvas"></canvas>
+    <canvas id="psCanvas"></canvas>
   </div>
+
+  <div class="ps-controls">
+    <div class="ps-skillbar">
+      <button class="ps-skill" id="psSkill0" onclick="psUseSkill(0)">
+        <span class="ps-skill-cd"></span>
+        <span class="ps-skill-icon">💥</span>
+        <span class="ps-skill-name">一斉射撃</span>
+        <span class="ps-skill-num">1</span>
+      </button>
+      <button class="ps-skill" id="psSkill1" onclick="psUseSkill(1)">
+        <span class="ps-skill-cd"></span>
+        <span class="ps-skill-icon">🔧</span>
+        <span class="ps-skill-name">応急修理</span>
+        <span class="ps-skill-num">2</span>
+      </button>
+      <button class="ps-skill" id="psSkill2" onclick="psUseSkill(2)">
+        <span class="ps-skill-cd"></span>
+        <span class="ps-skill-icon">📯</span>
+        <span class="ps-skill-name">追い風</span>
+        <span class="ps-skill-num">3</span>
+      </button>
+    </div>
+    <div class="ps-mobile-controls">
+      <button class="ps-btn ps-btn-left"
+              ontouchstart="psKey('left',true);event.preventDefault()"  ontouchend="psKey('left',false)"
+              onmousedown="psKey('left',true)" onmouseup="psKey('left',false)" onmouseleave="psKey('left',false)">◀</button>
+      <button class="ps-btn ps-btn-fire"
+              ontouchstart="psChargeStart();event.preventDefault()" ontouchend="psChargeRelease();event.preventDefault()">💥</button>
+      <button class="ps-btn ps-btn-right"
+              ontouchstart="psKey('right',true);event.preventDefault()" ontouchend="psKey('right',false)"
+              onmousedown="psKey('right',true)" onmouseup="psKey('right',false)" onmouseleave="psKey('right',false)">▶</button>
+    </div>
+    <p class="ps-help">◀▶／A・D で操舵　･　画面をなぞって照準　･　スペース長押しでチャージ砲　･　1/2/3 でスキル</p>
+  </div>
+
+  <!-- ── 補給港 ── -->
+  <div class="ps-port" id="psPort" style="display:none">
+    <div class="ps-port-box">
+      <div class="ps-port-title" id="psPortTitle">⚓ 補給港</div>
+      <div class="ps-port-sub"   id="psPortSub"></div>
+      <div class="ps-port-stats" id="psPortStats"></div>
+      <div class="ps-port-lead">強化を1つ選べ</div>
+      <div class="ps-port-cards" id="psPortCards"></div>
+      <div class="ps-port-actions" id="psPortActions"></div>
+    </div>
+  </div>
+
+  <!-- ── リザルト ── -->
   <div class="ps-result" id="psResult" style="display:none">
     <div class="ps-result-icon"   id="psResultIcon">🏴‍☠️</div>
-    <div class="ps-result-title"  id="psResultTitle" style="color:#d4a830">航海終了！</div>
-    <div class="ps-result-gold"   id="psResultGold">0G 獲得</div>
+    <div class="ps-result-title"  id="psResultTitle" style="color:#d4a830">航海終了</div>
+    <div class="ps-result-rank"   id="psResultRank"></div>
+    <div class="ps-result-gold"   id="psResultGold">0G</div>
     <div class="ps-result-detail" id="psResultDetail"></div>
+    <div class="ps-result-build"  id="psResultBuild"></div>
     <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px">
-      <button class="btn-start" onclick="startPirateSim()" style="padding:12px 36px">🔁 もう一度</button>
+      <button class="btn-start" onclick="startPirateSim()" style="padding:12px 36px">🔁 再出航</button>
       <button class="btn-ghost" onclick="exitPirateSim()">← メニューへ</button>
     </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.161/build/three.min.js"></script>
 <script src="daiko-piratesim.js"></script>
+<script type="module">
+  /* three.js は r150 で UMD の build/three.min.js が廃止されたため ESM で読み込む。
+     読めなかった場合はゲーム側が2D描画にフォールバックする。 */
+  import('https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js')
+    .then(m => { window.THREE = m; window.dispatchEvent(new Event('three-ready')); })
+    .catch(() => console.warn('three.js を読み込めませんでした（2D描画で続行します）'));
+</script>
 
 </body>
 </html>

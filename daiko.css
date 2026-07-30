@@ -1337,53 +1337,150 @@
   }
 
   /* ═══════════════════════════════════════
-     PIRATE SIM GAME
+     PIRATE SIM GAME — 七つの海の覇者
   ═══════════════════════════════════════ */
   #screen-piratesim { flex-direction:column; align-items:center; padding:0; overflow:hidden; position:relative; }
+
   .ps-header {
-    display:flex; align-items:center; gap:10px;
-    width:100%; padding:8px 12px; flex-shrink:0; z-index:2;
-    background:rgba(0,0,0,.6); border-bottom:1px solid rgba(180,140,60,.25);
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    width:100%; padding:7px 10px; flex-shrink:0; z-index:2;
+    background:rgba(0,0,0,.66); border-bottom:1px solid rgba(180,140,60,.25);
   }
-  .ps-hud-hp { flex:1; min-width:60px; }
-  .ps-hud-hp-label { font-size:11px; color:#8a6040; margin-bottom:2px; }
+  .ps-header .btn-back-menu { flex-shrink:0; }
+  .ps-hud-hp { flex:1 1 110px; min-width:90px; }
+  .ps-hud-hp-label { font-size:11px; color:#a07850; margin-bottom:2px; letter-spacing:.03em; }
   .ps-hud-hp-bar-wrap { height:10px; background:rgba(0,0,0,.5); border-radius:5px; overflow:hidden; border:1px solid rgba(180,60,60,.3); }
   .ps-hud-hp-bar { height:100%; border-radius:5px; background:linear-gradient(90deg,#c04030,#ff5040); transition:width .2s; }
-  .ps-hud-item  { font-size:14px; font-weight:800; color:#d4a830; white-space:nowrap; }
-  .ps-hud-timer { font-size:16px; font-weight:900; color:#c8b080; letter-spacing:.1em; }
+  .ps-hud-item  { font-size:13px; font-weight:800; color:#d4a830; white-space:nowrap; }
+  .ps-hud-leg   { color:#8ac0e8; }
+  .ps-hud-quota { color:#e08070; }
+  .ps-hud-combo { color:#ff9840; text-shadow:0 0 12px rgba(255,120,20,.6); }
+  .ps-hud-timer { font-size:14px; font-weight:900; color:#c8b080; letter-spacing:.08em; }
   .ps-hud-wind  { font-size:12px; color:#60b0e0; white-space:nowrap; }
+
+  .ps-stage { position:relative; width:100%; display:flex; justify-content:center; }
   #psCanvas { width:100%; max-width:var(--game-w); cursor:crosshair; touch-action:none; display:block; background:transparent; position:relative; z-index:1; }
-  #psThreeCanvas { display:none; position:absolute; z-index:0; left:50%; transform:translateX(-50%); pointer-events:none; }
-  .ps-mobile-controls {
-    display:grid;
-    grid-template-areas:". up ." "left fire right" ". down .";
-    grid-template-columns:1fr 1fr 1fr;
-    gap:5px; padding:8px; width:100%; max-width:200px; margin:4px auto 0;
+  #psThreeCanvas { display:none; position:absolute; z-index:0; top:0; left:50%; transform:translateX(-50%); pointer-events:none; }
+
+  .ps-controls { width:100%; max-width:var(--game-w); padding:6px 10px 14px; }
+  .ps-help { font-size:11px; color:rgba(160,140,105,.6); text-align:center; margin-top:8px; line-height:1.6; }
+
+  /* ── スキルバー ── */
+  .ps-skillbar { display:flex; gap:8px; justify-content:center; margin-top:6px; }
+  .ps-skill {
+    position:relative; overflow:hidden;
+    flex:1 1 0; max-width:132px; min-height:46px;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    background:rgba(10,6,20,.8); border:1px solid rgba(150,110,50,.32); border-radius:10px;
+    color:#7a6a52; font-size:12px; font-weight:800; cursor:pointer;
+    transition:border-color .18s, color .18s, box-shadow .18s;
+    user-select:none; -webkit-user-select:none; touch-action:manipulation;
   }
+  .ps-skill.ready { color:#ffd070; border-color:rgba(220,170,60,.6); box-shadow:0 0 14px rgba(200,150,40,.18) inset; }
+  .ps-skill.ready:active { background:rgba(200,150,50,.24); }
+  .ps-skill-cd { position:absolute; left:0; bottom:0; width:100%; height:0%; background:rgba(0,0,0,.62); pointer-events:none; transition:height .1s linear; }
+  .ps-skill-icon { font-size:17px; position:relative; }
+  .ps-skill-name { position:relative; letter-spacing:.02em; }
+  .ps-skill-num  { position:absolute; top:3px; right:6px; font-size:10px; color:rgba(200,175,120,.55); font-weight:700; }
+
+  /* ── 操舵ボタン ── */
+  .ps-mobile-controls { display:flex; gap:10px; justify-content:center; margin-top:9px; }
   .ps-btn {
+    flex:1 1 0; max-width:132px; height:50px;
     background:rgba(0,0,0,.7); border:1px solid rgba(180,140,60,.35); border-radius:10px;
-    color:#c8a060; font-size:16px; width:56px; height:48px; cursor:pointer;
+    color:#c8a060; font-size:17px; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
-    user-select:none; -webkit-user-select:none; touch-action:manipulation; font-weight:700; margin:0 auto;
+    user-select:none; -webkit-user-select:none; touch-action:manipulation; font-weight:700;
   }
   .ps-btn:active { background:rgba(180,140,60,.3); color:#ffd060; }
-  .ps-btn-up    { grid-area:up; }
-  .ps-btn-down  { grid-area:down; }
-  .ps-btn-left  { grid-area:left; }
-  .ps-btn-right { grid-area:right; }
-  .ps-btn-fire  { grid-area:fire; background:rgba(160,30,30,.75); border-color:rgba(255,60,60,.4); color:#ff8060; font-size:20px; }
+  .ps-btn-fire  { background:rgba(160,30,30,.75); border-color:rgba(255,60,60,.4); color:#ff8060; font-size:21px; }
   .ps-btn-fire:active { background:rgba(255,60,60,.45); }
+
+  /* ── 補給港 ── */
+  .ps-port {
+    position:fixed; inset:0; z-index:290;
+    display:flex; align-items:center; justify-content:center; padding:18px 12px;
+    background:rgba(0,2,14,.9); backdrop-filter:blur(10px);
+    animation:cfadein .35s ease; overflow-y:auto;
+  }
+  .ps-port-box {
+    width:100%; max-width:760px;
+    background:linear-gradient(180deg,rgba(22,14,8,.96),rgba(10,7,14,.96));
+    border:1px solid rgba(190,145,55,.4); border-radius:16px;
+    padding:20px 18px 18px; text-align:center;
+    box-shadow:0 18px 60px rgba(0,0,0,.7), 0 0 60px rgba(160,110,30,.09) inset;
+  }
+  .ps-port-title { font-size:clamp(20px,4.6vw,27px); font-weight:900; color:#ffd070; letter-spacing:.06em; }
+  .ps-port-sub   { font-size:13px; color:#a89070; margin-top:5px; }
+  .ps-port-sub b { color:#ffd878; }
+  .ps-warn { color:#ff6a60; font-weight:900; }
+  .ps-port-stats {
+    display:flex; flex-wrap:wrap; gap:6px 12px; justify-content:center;
+    margin:12px 0 4px; font-size:12px; color:#9aa8b8;
+    padding:9px 8px; background:rgba(0,0,0,.34); border-radius:9px;
+    border:1px solid rgba(120,110,90,.16);
+  }
+  .ps-port-lead { font-size:12px; color:rgba(180,160,120,.7); letter-spacing:.18em; margin:14px 0 8px; }
+  .ps-port-cards { display:grid; grid-template-columns:1fr; gap:9px; }
+  .ps-card {
+    display:grid; grid-template-columns:auto 1fr; grid-template-rows:auto auto auto;
+    gap:2px 12px; align-items:center; text-align:left;
+    padding:12px 14px; cursor:pointer;
+    background:rgba(255,255,255,.03); border:1px solid rgba(150,130,90,.28); border-radius:12px;
+    color:#e8d8b0; transition:transform .16s, border-color .16s, background .16s;
+  }
+  .ps-card:hover:not(:disabled) { transform:translateY(-2px); background:rgba(255,220,150,.09); border-color:rgba(230,180,70,.65); }
+  .ps-card:disabled { opacity:.34; cursor:default; }
+  .ps-card-icon { grid-row:1 / span 3; font-size:29px; line-height:1; }
+  .ps-card-name { font-size:16px; font-weight:900; color:#ffd878; }
+  .ps-card-lv   { font-size:11px; color:#8fa0b0; }
+  .ps-card-desc { font-size:12.5px; color:#b8ab90; line-height:1.5; }
+  .ps-card-rar  { position:absolute; opacity:0; }
+  .ps-card-c { border-left:3px solid rgba(140,160,180,.55); }
+  .ps-card-r { border-left:3px solid rgba(90,180,255,.7);  box-shadow:0 0 18px rgba(60,150,255,.09) inset; }
+  .ps-card-e { border-left:3px solid rgba(230,110,255,.8); box-shadow:0 0 22px rgba(200,80,255,.14) inset; }
+  .ps-card-e .ps-card-name { color:#f0a8ff; }
+  .ps-card-empty { font-size:13px; color:#8a7a60; padding:14px; }
+  .ps-port-actions { display:flex; flex-wrap:wrap; gap:9px; justify-content:center; margin-top:16px; }
+  .ps-port-btn {
+    background:rgba(0,0,0,.5); border:1px solid rgba(160,130,70,.4); border-radius:9px;
+    color:#c8b28a; font-size:13px; font-weight:700; padding:10px 16px; cursor:pointer;
+    transition:all .18s;
+  }
+  .ps-port-btn b { color:#ffd060; }
+  .ps-port-btn:hover:not(:disabled) { background:rgba(200,160,60,.2); color:#ffe0a0; }
+  .ps-port-btn:disabled { opacity:.32; cursor:default; }
+  .ps-port-sail {
+    background:linear-gradient(135deg,#b8801c,#e0aa30); border-color:rgba(255,220,140,.6);
+    color:#1a1004; font-weight:900; padding:10px 30px;
+  }
+  .ps-port-sail:hover { background:linear-gradient(135deg,#d09424,#ffc848); color:#1a1004; }
+
+  /* ── リザルト ── */
   .ps-result {
     position:fixed; inset:0; z-index:300;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:14px; background:rgba(0,0,20,.88); backdrop-filter:blur(12px);
-    animation:cfadein .4s ease;
+    gap:11px; padding:20px 14px; background:rgba(0,0,20,.9); backdrop-filter:blur(12px);
+    animation:cfadein .4s ease; overflow-y:auto;
   }
-  .ps-result-icon   { font-size:72px; line-height:1; }
-  .ps-result-title  { font-size:clamp(28px,7vw,46px); font-weight:900; letter-spacing:.08em; }
+  .ps-result-icon   { font-size:66px; line-height:1; }
+  .ps-result-title  { font-size:clamp(26px,6.5vw,42px); font-weight:900; letter-spacing:.08em; }
+  .ps-result-rank   { font-size:17px; font-weight:800; color:#c8b8ff; letter-spacing:.05em; }
   .ps-result-gold   { font-size:34px; font-weight:900; color:#ffd040; text-shadow:0 0 28px rgba(220,160,0,.75); }
-  .ps-result-detail { font-size:15px; color:#7a6040; }
-}
+  .ps-result-detail { display:flex; flex-wrap:wrap; gap:6px 18px; justify-content:center; font-size:14px; color:#9a8460; }
+  .ps-result-detail b { color:#e8d0a0; }
+  .ps-result-build  { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; max-width:520px; }
+  .ps-res-up {
+    font-size:11px; color:#b0a084; background:rgba(255,255,255,.05);
+    border:1px solid rgba(150,130,90,.25); border-radius:20px; padding:4px 10px;
+  }
+  .ps-res-up b { color:#ffd070; margin-left:4px; }
+
+  @media (min-width: 620px) {
+    .ps-port-cards { grid-template-columns:repeat(3, 1fr); }
+    .ps-card { grid-template-columns:1fr; grid-template-rows:auto auto auto auto; text-align:center; gap:4px; padding:16px 12px; }
+    .ps-card-icon { grid-row:auto; font-size:34px; }
+  }
 
 /* ══════════════════ API SETTINGS ══════════════════ */
 #apiSettingsBtn {

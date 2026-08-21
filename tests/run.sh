@@ -39,6 +39,10 @@ echo "── 4. 海賊シム本体 ──"
 node tests/pirate-sim.test.js || fail=1
 
 echo
+echo "── 5. サイトの導線（入口・戻る・リンク切れ） ──"
+node tests/site-links.test.js || fail=1
+
+echo
 if [ "$fail" -eq 0 ]; then
   echo "════ すべて通りました ════"
 else
